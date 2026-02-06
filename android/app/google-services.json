@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "942056674519",
+    "project_id": "wisdeals-f0eeb",
+    "storage_bucket": "wisdeals-f0eeb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:942056674519:android:514920ad2a7be06abdcc92",
+        "android_client_info": {
+          "package_name": "com.example.wisdeals"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQqL8X1WqHB6Udx_ZCLuf9QXwELZyQ7qA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

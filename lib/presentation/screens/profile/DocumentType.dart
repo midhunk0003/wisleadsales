@@ -1,0 +1,1 @@
+enum DocumentType { resume, addressProof }
