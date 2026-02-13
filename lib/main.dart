@@ -12,6 +12,7 @@ import 'package:wisdeals/data/model/lead_managment_model/lead_managment_model.da
 import 'package:wisdeals/data/model/order_and_client_model/order_and_client_model.dart';
 import 'package:wisdeals/firebase_options.dart';
 import 'package:wisdeals/presentation/provider/auth_provider.dart';
+import 'package:wisdeals/presentation/provider/business_provider.dart';
 import 'package:wisdeals/presentation/provider/drawer_provider.dart';
 import 'package:wisdeals/presentation/provider/expanse_provider.dart';
 import 'package:wisdeals/presentation/provider/home_provider.dart';
@@ -24,6 +25,8 @@ import 'package:wisdeals/presentation/provider/order_provider.dart';
 import 'package:wisdeals/presentation/provider/profile_provider.dart';
 import 'package:wisdeals/presentation/provider/report_provider.dart';
 import 'package:wisdeals/presentation/screens/attendanceandleave/attendance_and_leave_screen.dart';
+import 'package:wisdeals/presentation/screens/business/add_business.dart';
+import 'package:wisdeals/presentation/screens/business/business_screen.dart';
 import 'package:wisdeals/presentation/screens/expanse/add_expanse_screen.dart';
 import 'package:wisdeals/presentation/screens/expanse/expanse_list_screen.dart';
 import 'package:wisdeals/presentation/screens/expanse/update_expanse_screen.dart';
@@ -83,6 +86,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => getIt<OrderProvider>()),
         ChangeNotifierProvider(create: (_) => getIt<MeetingProvider>()),
         ChangeNotifierProvider(create: (_) => getIt<LeadProvider>()),
+        ChangeNotifierProvider(create: (_) => getIt<BusinessProvider>()),
         ChangeNotifierProvider(create: (_) => getIt<ExpanseProvider>()),
         ChangeNotifierProvider(create: (_) => getIt<NotificationProvider>()),
         ChangeNotifierProvider(create: (_) => getIt<ReportProvider>()),
@@ -161,6 +165,10 @@ class MyApp extends StatelessWidget {
               return _customPageRoute(NotificationScreen());
             case '/attendanceandleavescreen':
               return _customPageRoute(AttendanceAndLeaveScreen());
+            case '/businessScreen':
+              return _customPageRoute(BusinessScreen());
+            case '/addBusiness':
+              return _customPageRoute(AddBusiness());
 
             default:
               return null;

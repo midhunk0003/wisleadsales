@@ -6,6 +6,7 @@ import 'package:wisdeals/data/model/order_and_client_model/order_and_client_mode
 abstract class OrderAndClientRepository {
   Future<Either<Failure, List<Clients>>> getClients(
     String? token,
+    String? search,
     String? page,
     String? status,
     String? customerProfileId,

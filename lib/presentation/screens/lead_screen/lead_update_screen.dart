@@ -760,6 +760,7 @@ class _LeadUpdateScreenState extends State<LeadUpdateScreen> {
                                               leadProvider.getLeadStatusPro();
                                               leadProvider.getLeadPro(
                                                 '',
+                                                '',
                                                 isRefresh: true,
                                               );
 

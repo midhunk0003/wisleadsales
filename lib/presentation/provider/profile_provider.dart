@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wisdeals/core/failure.dart';
 import 'package:wisdeals/core/success.dart';
+import 'package:wisdeals/data/model/monthly_target_model/monthly_target_model.dart';
 import 'package:wisdeals/data/model/profile_model/profile_model.dart';
 import 'package:wisdeals/domain/repository/profile_repository.dart';
 import 'package:wisdeals/presentation/screens/profile/DocumentType.dart';
@@ -22,6 +23,7 @@ class ProfileProvider extends ChangeNotifier {
   bool _isLoading = false;
   bool _isSaveLoading = false;
   ProfileData? _profileDatas;
+  List<Target>? _listOfMonthTarger;
   Failure? _failure;
   Success? _success;
   File? _selectedFile;
@@ -31,11 +33,17 @@ class ProfileProvider extends ChangeNotifier {
   final ImagePicker imagePicker = ImagePicker();
   CameraController? _cameraController;
 
+  // profile expand the grouping
+  bool _showProject = false;
+  bool _showProfile = false;
+  bool _showDocument = false;
+
   // getter
 
   bool get isLoading => _isLoading;
   bool get isSaveLoading => _isSaveLoading;
   ProfileData? get profileDatas => _profileDatas;
+  List<Target>? get listOfMonthTarger => _listOfMonthTarger;
   Failure? get failure => _failure;
   Success? get success => _success;
   File? get selectedFile => _selectedFile;
@@ -44,7 +52,113 @@ class ProfileProvider extends ChangeNotifier {
   File? get addressProofFile => _addressProofFile;
   CameraController? get cameraController => _cameraController;
 
+  // Selected Year
+  int _selectedYear = DateTime.now().year;
+
+  int get selectedYear => _selectedYear;
+  List<int> get yearList =>
+      List.generate(3, (index) => DateTime.now().year - index);
+
+  // profile expand the grouping
+  bool get showProject => _showProject;
+  bool get showProfile => _showProfile;
+  bool get showDocument => _showDocument;
+
   // functions
+
+  void changeYear(int year) {
+    _selectedYear = year;
+    notifyListeners();
+  }
+
+  Map<String, dynamic> getAchievementStatus(double achieved, double target) {
+    /// Handle No Data
+    if (target == 0 || achieved == 0) {
+      return {
+        "text": "No Data",
+        "icon": Icons.info_outline,
+        "color": Colors.grey,
+      };
+    }
+
+    final percent = (achieved / target) * 100;
+
+    /// Exactly 100 %
+    if (percent == 100) {
+      return {
+        "text": "Completed",
+        "icon": Icons.emoji_events,
+        "color": Colors.green, // Success
+      };
+    }
+
+    /// 90 – 99 %
+    if (percent >= 90 && percent < 100) {
+      return {
+        "text": "Almost Completed",
+        "icon": Icons.workspace_premium,
+        "color": Colors.amber, // Near success
+      };
+    }
+
+    /// Above 100 %
+    if (percent > 100) {
+      return {
+        "text": "Super Achieved",
+        "icon": Icons.rocket_launch,
+        "color": Colors.deepPurple, // Special highlight
+      };
+    }
+
+    /// 50 – 89 %
+    if (percent >= 50) {
+      return {
+        "text": "Good Progress",
+        "icon": Icons.thumb_up,
+        "color": Colors.teal, // Positive progress
+      };
+    }
+
+    /// 10 – 49 %
+    if (percent >= 10) {
+      return {
+        "text": "Needs Improvement",
+        "icon": Icons.trending_up,
+        "color": Colors.blue, // Work ongoing
+      };
+    }
+
+    /// Below 10 %
+    return {
+      "text": "Very Low",
+      "icon": Icons.warning_amber_rounded,
+      "color": Colors.red, // Danger
+    };
+  }
+
+  /// Toggle Project
+  void toggleProject() {
+    _showProject = !_showProject;
+    _showProfile = false;
+    _showDocument = false;
+    notifyListeners();
+  }
+
+  /// Toggle Profile
+  void toggleProfile() {
+    _showProfile = !_showProfile;
+    _showProject = false;
+    _showDocument = false;
+    notifyListeners();
+  }
+
+  /// Toggle Document
+  void toggleDocument() {
+    _showDocument = !_showDocument;
+    _showProfile = false;
+    _showProject = false;
+    notifyListeners();
+  }
 
   // get data
   void clearFailure() {
@@ -122,71 +236,6 @@ class ProfileProvider extends ChangeNotifier {
     }
   }
 
-  // Future<void> pickCameraAndGallery(
-  //   ImageSource source,
-  //   DocumentType type,
-  // ) async {
-  //   final XFile? image = await imagePicker.pickImage(source: source);
-
-  //   if (image != null) {
-  //     File? compressedFile;
-
-  //     // Check if the image is already under 3MB
-  //     final fileSize = await File(image.path).length();
-  //     final fileSizeInMB = fileSize / (1024 * 1024);
-
-  //     if (fileSizeInMB > 3) {
-  //       // Compress the image
-  //       final compressedBytes = await FlutterImageCompress.compressWithFile(
-  //         image.path,
-  //         minWidth: 1024, // Set maximum width
-  //         minHeight: 1024, // Set maximum height
-  //         quality: 85, // Quality percentage (85% is usually good)
-  //         format: CompressFormat.jpeg, // You can also use CompressFormat.png
-  //       );
-
-  //       if (compressedBytes != null) {
-  //         // Create a temporary file for compressed image
-  //         final tempDir = await getTemporaryDirectory();
-  //         final targetPath =
-  //             '${tempDir.path}/${DateTime.now().millisecondsSinceEpoch}.jpg';
-
-  //         compressedFile = await File(targetPath).writeAsBytes(compressedBytes);
-
-  //         // Check if compressed file is under 3MB
-  //         final compressedSize = await compressedFile.length();
-  //         final compressedSizeInMB = compressedSize / (1024 * 1024);
-
-  //         if (compressedSizeInMB > 3) {
-  //           // If still too large, compress more aggressively
-  //           final moreCompressedBytes =
-  //               await FlutterImageCompress.compressWithFile(
-  //                 targetPath,
-  //                 minWidth: 800,
-  //                 minHeight: 800,
-  //                 quality: 70,
-  //               );
-
-  //           if (moreCompressedBytes != null) {
-  //             compressedFile = await File(
-  //               targetPath,
-  //             ).writeAsBytes(moreCompressedBytes);
-  //           }
-  //         }
-  //       }
-  //     }
-
-  //     final file = compressedFile ?? File(image.path);
-
-  //     if (type == DocumentType.resume) {
-  //       _resumeFile = file;
-  //     } else {
-  //       _addressProofFile = file;
-  //     }
-  //     notifyListeners();
-  //   }
-  // }
-
   // File picker (PDF / DOC / Images)
   Future<void> pickFile(DocumentType type) async {
     final result = await FilePicker.platform.pickFiles(
@@ -234,6 +283,32 @@ class ProfileProvider extends ChangeNotifier {
         print(
           'xxxxxxxxxxxxxxx.......................... xxxxxxxxxxxxxxx${success.isActive}',
         );
+        _isLoading = false;
+        notifyListeners();
+      },
+    );
+  }
+
+  Future<void> getMonthYearReportPro(String? year) async {
+    _isLoading = true;
+    _failure = null;
+    notifyListeners();
+    final SharedPreferences pref = await SharedPreferences.getInstance();
+    String? token = pref.getString('token');
+    print('token : ${token}');
+    final result = await profileRepository.getProjectReportMonth(token, year);
+    result.fold(
+      (failure) async {
+        if (failure is AuthFailure) {
+          print('vvvvvvvvvvvvvvvvvvvv...${failure.message}');
+          await AuthService.forceLogout();
+        }
+        _failure = failure;
+        _isLoading = false;
+        notifyListeners();
+      },
+      (success) {
+        _listOfMonthTarger = success;
         _isLoading = false;
         notifyListeners();
       },

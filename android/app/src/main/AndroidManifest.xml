@@ -20,7 +20,7 @@
   <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
   <uses-permission android:name="android.permission.CALL_PHONE"/>
     <application
-        android:label="WTEAMS"
+        android:label="Wislead"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <meta-data android:name="com.google.android.geo.API_KEY"

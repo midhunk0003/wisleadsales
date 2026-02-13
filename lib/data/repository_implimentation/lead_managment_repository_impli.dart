@@ -106,6 +106,7 @@ class LeadManagmentRepositoryImpli extends LeadManagmentRepository {
   @override
   Future<Either<Failure, LeadManagmentModel>> getLead(
     String? token,
+    String? search,
     String? leadStatusId,
     String? currentPage,
   ) async {
@@ -115,7 +116,11 @@ class LeadManagmentRepositoryImpli extends LeadManagmentRepository {
       final response = await client.post(
         Uri.parse("${ApiEndPoint.baseUrl}${ApiEndPoint.leadsEndPoint}"),
         headers: {'Authorization': 'Bearer $token'},
-        body: {"lead_status_id": leadStatusId ?? '', 'page': currentPage ?? ''},
+        body: {
+          "search": search ?? '',
+          "lead_status_id": leadStatusId ?? '',
+          'page': currentPage ?? '',
+        },
       );
 
       log("lead list  : ${response.body}");

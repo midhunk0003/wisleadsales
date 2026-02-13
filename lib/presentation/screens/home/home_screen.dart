@@ -50,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
       //Load Home Data
       provider.getHomePro();
       // // Then load lead data
-      leadprovider.getLeadPro('', isRefresh: true);
+      leadprovider.getLeadPro('', '', isRefresh: true);
       // //Load Profile Data
       profileProviders.getProfileData(); // wait for data to load
       // // Load Profile Image from Shared
@@ -105,7 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
             onRetry: () async {
               await Future.wait([
                 homeProvider.getHomePro(),
-                leadProvider.getLeadPro('', isRefresh: true),
+                leadProvider.getLeadPro('', '', isRefresh: true),
                 profileProvider.getProfileData(),
               ]);
             },
@@ -177,7 +177,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           SizedBox(height: 30),
-                          CustomAppBarWidget(title: "WTEAMS"),
+                          CustomAppBarWidget(title: "WISLEAD"),
                           SizedBox(height: 40),
                           RichText(
                             text: TextSpan(

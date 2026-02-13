@@ -56,6 +56,11 @@ class DrawerProvider extends ChangeNotifier {
         'route': '/notificationscreen',
       },
       {
+        'iconImage': "assets/images/brefcase.png",
+        'title': "Business",
+        'route': '/businessScreen',
+      },
+      {
         'iconImage': "assets/images/drawericons/Help.png",
         'title': "Settings",
         'route': '/bottomnavbarwidget',

@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:wisdeals/core/api_end_point.dart';
 import 'package:wisdeals/core/failure.dart';
 import 'package:wisdeals/core/success.dart';
+import 'package:wisdeals/data/model/monthly_target_model/monthly_target_model.dart';
 import 'package:wisdeals/data/model/profile_model/profile_model.dart';
 import 'package:wisdeals/domain/repository/profile_repository.dart';
 
@@ -20,11 +21,11 @@ class ProfileRepositoryImpli implements ProfileRepository {
         Uri.parse("${ApiEndPoint.baseUrl}${ApiEndPoint.profileEndPoint}"),
         headers: {'Authorization': 'Bearer $token'},
       );
-      log("get profile data   : ${response.body}");
+      log("get profile data...   : ${response.body}");
       if (response.statusCode == 200) {
         final data = json.decode(response.body)['data'];
         final profileData = ProfileData.fromJson(data);
-        print('profile data  inside : ${profileData.id}');
+        // print('profile data  inside : ${profileData.id}');
         return Right(profileData);
       }
       // ✅ 401 — TOKEN EXPIRED / UNAUTHORIZED
@@ -181,6 +182,76 @@ class ProfileRepositoryImpli implements ProfileRepository {
         final message = data['message'];
         print('inside profile add  : ${message}');
         return Right(Success(message: message));
+      }
+      // ✅ 401 — TOKEN EXPIRED / UNAUTHORIZED
+      else if (response.statusCode == 401) {
+        String message = "Unauthorized access";
+
+        final errorBody = json.decode(response.body);
+
+        message = errorBody['message'] ?? message;
+
+        return Left(AuthFailure(message));
+      } else if (response.statusCode >= 400 && response.statusCode < 500) {
+        final errorBody = json.decode(response.body);
+        final message = errorBody['message'] ?? 'Something went wrong';
+        return Left(ClientFailure(message));
+      } else if (response.statusCode >= 500) {
+        try {
+          final errorBody = json.decode(response.body);
+          final message = errorBody['message'] ?? response.body.toString();
+          return Left(ServerFailure(message));
+        } catch (e) {
+          print("XXXXXXXXXXXXX${e}");
+          // if body is not JSON (HTML / plain text), just show raw body
+          return Left(
+            ServerFailure(
+              response.body.isNotEmpty
+                  ? 'Internal server error (500)'
+                  : 'Internal server error (500)',
+            ),
+          );
+        }
+      } else {
+        return Left(
+          OtherFailureNon200('Unexpected status: ${response.statusCode}'),
+        );
+      }
+    } on SocketException {
+      return Left(NetworkFailure('No Internet connection'));
+    } catch (e) {
+      log('Unexpected error: $e');
+      return Left(OtherFailureNon200('Unexpected error occurred'));
+    } finally {
+      // Optional cleanup logic
+      log('API call completed'); // for debugging
+      client.close(); //if you created an HttpClient manually
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<Target>?>> getProjectReportMonth(
+    String? token,
+    String? year,
+  ) async {
+    final client = http.Client();
+
+    try {
+      final response = await client.get(
+        Uri.parse(
+          "${ApiEndPoint.baseUrl}${ApiEndPoint.monthlyTarget}?year=${year}",
+        ),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+      log("get profile data monthly report...   : ${response.body}");
+      if (response.statusCode == 200) {
+        final List<dynamic> data =
+            json.decode(response.body)['data']['targets'];
+        // 👉 Convert to Model List
+        final List<Target> targetsList =
+            data.map((e) => Target.fromJson(e)).toList();
+        print('profile monthly report  inside : ${targetsList}');
+        return Right(targetsList);
       }
       // ✅ 401 — TOKEN EXPIRED / UNAUTHORIZED
       else if (response.statusCode == 401) {

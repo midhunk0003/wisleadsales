@@ -2,13 +2,13 @@ class ApiEndPoint {
   // static const String baseUrl = "http://192.168.29.195:8000/api/";
   // static const String photoBaseUrl = "http://192.168.29.195:8000/storage/";
 
-  // static const String baseUrl = "https://app.wisleadcrm.com/api/";
-  // static const String photoBaseUrl =
-  //     "https://app.wisleadcrm.com/storage/app/public/";
-
-  static const String baseUrl = "https://teams.wwitpl.com/sales-backend/api/";
+  static const String baseUrl = "https://app.wisleadcrm.com/api/";
   static const String photoBaseUrl =
-      "https://teams.wwitpl.com/sales-backend/storage/app/public/";
+      "https://app.wisleadcrm.com/storage/app/public/";
+
+  // static const String baseUrl = "https://teams.wwitpl.com/sales-backend/api/";
+  // static const String photoBaseUrl =
+  //     "https://teams.wwitpl.com/sales-backend/storage/app/public/";
 
   // https://teams.wwitpl.com/sales-backend/api/login
   // http://app.wisleadcrm.com/api/login
@@ -27,6 +27,7 @@ class ApiEndPoint {
   // profile
   static const String profileEndPoint = "profile";
   static const String updateProfile = "updateProfile";
+  static const String monthlyTarget = "monthlyTarget";
 
   // home api end point
   static const String getHomeEndPoint = "getHome";
@@ -77,4 +78,14 @@ class ApiEndPoint {
   // clock in and clock out
   static const String clockInEndPoint = "clockIn";
   static const String clockOutEndPoint = "clockOut";
+
+  // business section
+  static const String clientNameEndPoint = "clientName";
+  static const String businessNameEndPoint = "businessName";
+  static const String businessAddEndPoint = "businessAdd";
+  static const String businessListEndPoint = "businessList";
+  static const String businessAddCollectionsEndPoint = "businessAddCollections";
+  static const String businessDeleteEndPoint = "businessDelete";
+  static const String businessDeletecollectionsEndPoint =
+      "businessDeletecollections";
 }

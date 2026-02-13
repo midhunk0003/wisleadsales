@@ -749,6 +749,7 @@ class _LeadMeetingListTabState extends State<LeadMeetingListTab> {
                                                                     leadProvider
                                                                         .getLeadPro(
                                                                           '',
+                                                                          '',
                                                                         );
                                                                   }
                                                                 },
@@ -1172,7 +1173,7 @@ class _LeadMeetingListTabState extends State<LeadMeetingListTab> {
                                                 "Success",
                                                 "${leadProvider.success!.message}",
                                               );
-                                              leadProvider.getLeadPro('');
+                                              leadProvider.getLeadPro('', '');
                                             }
                                           } else {
                                             ScaffoldMessenger.of(

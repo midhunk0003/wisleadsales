@@ -410,6 +410,7 @@ class _OrderSingleViewScreenState extends State<OrderSingleViewScreen> {
                                                       );
                                                       orderProvider
                                                           .getClientsPro(
+                                                            '',
                                                             isRefresh: false,
                                                             '',
                                                             '',
@@ -1116,6 +1117,7 @@ class _OrderSingleViewScreenState extends State<OrderSingleViewScreen> {
                                                   "${orderProvider.success!.message}",
                                                 );
                                                 orderProvider.getClientsPro(
+                                                  '',
                                                   isRefresh: true,
                                                   '',
                                                   '',
@@ -1416,6 +1418,7 @@ class _AddMeetingWidgetState extends State<AddMeetingWidget> {
 
                                       if (widget.provider.success != null) {
                                         widget.provider.getClientsPro(
+                                          '',
                                           isRefresh: true,
                                           '',
                                           '',
@@ -1671,6 +1674,7 @@ class _MeetingCardState extends State<MeetingCard> {
                               .toString(),
                         );
                         widget.orderClientProvider.getClientsPro(
+                          '',
                           '',
                           '',
                           isRefresh: true,

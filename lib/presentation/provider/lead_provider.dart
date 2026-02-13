@@ -390,6 +390,7 @@ class LeadProvider extends ChangeNotifier {
   }
 
   Future<void> getLeadPro(
+    String? search,
     String? leadStatusId, {
     bool isRefresh = false,
   }) async {
@@ -422,6 +423,7 @@ class LeadProvider extends ChangeNotifier {
 
     final result = await leadManagmentRepository.getLead(
       token,
+      search.toString(),
       leadStatusId,
       _currentPage.toString(),
     );

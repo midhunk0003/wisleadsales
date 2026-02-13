@@ -436,6 +436,7 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
                                               leadSourceController.clear();
                                               addNoteController.clear();
                                               orderProvider.getClientsPro(
+                                                '',
                                                 isRefresh: true,
                                                 '',
                                                 '',

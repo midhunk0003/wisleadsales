@@ -327,6 +327,7 @@ class OrderProvider extends ChangeNotifier {
 
   // get clients
   Future<void> getClientsPro(
+    String? search,
     String? status,
     String? customerPriorityId, {
     bool isRefresh = false,
@@ -358,6 +359,7 @@ class OrderProvider extends ChangeNotifier {
     String? token = pref.getString('token');
     final result = await orderAndClientRepository.getClients(
       token,
+      search,
       currentPage.toString(),
       status,
       customerPriorityId,

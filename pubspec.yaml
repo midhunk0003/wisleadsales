@@ -153,6 +153,7 @@ flutter:
     - assets/images/calllognew.png
     - assets/images/whatsappnew.png
     - assets/images/lead/allmeetings.png
+    - assets/images/brefcase.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 

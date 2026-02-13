@@ -45,7 +45,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
       );
       orderProvider.getleadStatusPro();
       orderProvider.getleadPriorityPro();
-      await orderProvider.getClientsPro(isRefresh: true, '', '');
+      await orderProvider.getClientsPro('', isRefresh: true, '', '');
       // for filter section
       await leadProvider.getCustomerProfilePro();
       orderProvider.getClientStatus();
@@ -63,7 +63,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
 
       if (!orderProvider.isLoadingMore && orderProvider.hasMore) {
         // print('listening  and index name${leadProvider.getFilterLeadIndex}');
-        orderProvider.getClientsPro(isRefresh: false, '', '');
+        orderProvider.getClientsPro('', isRefresh: false, '', '');
       }
     } else {
       print('no listening ');
@@ -130,7 +130,12 @@ class _OrdersScreenState extends State<OrdersScreen> {
                       orderProvider.failure?.message ??
                       "No internet connection",
                   onRetry: () async {
-                    await orderProvider.getClientsPro(isRefresh: false, '', '');
+                    await orderProvider.getClientsPro(
+                      '',
+                      isRefresh: false,
+                      '',
+                      '',
+                    );
                   },
                 );
               }
@@ -153,12 +158,18 @@ class _OrdersScreenState extends State<OrdersScreen> {
                           isTablet: isTablet,
                           title: "Search Client",
                           textEditingController: _searchController,
-                          onChange: () {
+                          onChange: () async {
                             print(
                               'onchange search variable ${_searchController.text}',
                             );
-                            orderProvider.searchLeadList(
-                              _searchController.text,
+                            // orderProvider.searchLeadList(
+                            //   _searchController.text,
+                            // );
+                            await orderProvider.getClientsPro(
+                              '${_searchController.text.toString()}',
+                              isRefresh: true,
+                              '',
+                              '',
                             );
                           },
                           onTap: () {
@@ -189,29 +200,33 @@ class _OrdersScreenState extends State<OrdersScreen> {
                             )
                             : (orderProvider.searchedclientList == null ||
                                 orderProvider.searchedclientList!.isEmpty)
-                            ? Container(
-                              width: double.infinity,
-                              height: 500,
-                              decoration: BoxDecoration(
-                                color: Colors.transparent,
-                              ),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Lottie.asset(
-                                    'assets/json/noevents.json',
-                                    width: scale(150),
+                            ? Expanded(
+                              child: Container(
+                                width: double.infinity,
+                                height: 500,
+                                decoration: BoxDecoration(
+                                  color: Colors.transparent,
+                                ),
+                                child: SingleChildScrollView(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Lottie.asset(
+                                        'assets/json/noevents.json',
+                                        width: scale(150),
+                                      ),
+                                      const SizedBox(height: 10),
+                                      Text(
+                                        'No Client Found',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: scale(16),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  const SizedBox(height: 10),
-                                  Text(
-                                    'No Client Found',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: scale(16),
-                                    ),
-                                  ),
-                                ],
+                                ),
                               ),
                             )
                             : Expanded(
@@ -756,6 +771,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                 orderProvider.hideandShowFilter();
 
                                 orderProvider.getClientsPro(
+                                  '',
                                   isRefresh: true,
                                   orderProvider.selectedStatusName ?? '',
                                   orderProvider.selectedCustomerProfileId

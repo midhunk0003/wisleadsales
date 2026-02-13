@@ -59,7 +59,13 @@ class MeetingProvider extends ChangeNotifier {
     notifyListeners();
     final SharedPreferences pref = await SharedPreferences.getInstance();
     String? token = pref.getString('token');
-    final result = await orderAndClientRepository.getClients(token, '', '', '');
+    final result = await orderAndClientRepository.getClients(
+      token,
+      '',
+      '',
+      '',
+      '',
+    );
     result.fold(
       (failure) {
         _failure = failure;
@@ -112,7 +118,7 @@ class MeetingProvider extends ChangeNotifier {
     final SharedPreferences pref = await SharedPreferences.getInstance();
     String? token = pref.getString('token');
     print("token ${token}");
-    final result = await leadManagmentRepository.getLead(token, status, '');
+    final result = await leadManagmentRepository.getLead(token, status, '', '');
     result.fold(
       (failure) {
         _isLoading = false;

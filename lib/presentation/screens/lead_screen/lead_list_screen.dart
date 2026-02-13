@@ -53,7 +53,7 @@ class _LeadListScreenState extends State<LeadListScreen> {
     // First load status
     await leadProvider.getLeadStatusPro();
     // Then load lead data
-    await leadProvider.getLeadPro('', isRefresh: true);
+    await leadProvider.getLeadPro('', '', isRefresh: true);
     leadProvider.getLeadSourcePro();
     // Load customer profile
     leadProvider.getCustomerProfilePro();
@@ -67,6 +67,7 @@ class _LeadListScreenState extends State<LeadListScreen> {
       if (!leadProvider.isLoadingMore && leadProvider.hasMore) {
         print('listening  and index name${leadProvider.getFilterLeadIndex}');
         leadProvider.getLeadPro(
+          '',
           leadProvider.getFilterLeadIndex,
           isRefresh: false,
         );
@@ -115,7 +116,7 @@ class _LeadListScreenState extends State<LeadListScreen> {
                           leadProvider.failure?.message ??
                           "No internet connection",
                       onRetry: () async {
-                        await leadProvider.getLeadPro('', isRefresh: true);
+                        await leadProvider.getLeadPro('', '', isRefresh: true);
                       },
                     );
                   }
@@ -151,12 +152,17 @@ class _LeadListScreenState extends State<LeadListScreen> {
                               isTablet: isTablet,
                               title: "Search Leads...",
                               textEditingController: _searchController,
-                              onChange: () {
+                              onChange: () async {
                                 print(
                                   'onchange search variable ${_searchController.text}',
                                 );
-                                leadProvider.searchLeadList(
-                                  _searchController.text,
+                                // leadProvider.searchLeadList(
+                                //   _searchController.text,
+                                // );
+                                await leadProvider.getLeadPro(
+                                  '${_searchController.text.toString()}',
+                                  '',
+                                  isRefresh: true,
                                 );
                               },
                               onTap: () {},
@@ -193,6 +199,7 @@ class _LeadListScreenState extends State<LeadListScreen> {
                                             'assss : ${leadProvider.filterStringLead[index]['statusid']}',
                                           );
                                           leadProvider.getLeadPro(
+                                            '',
                                             '${leadProvider.filterStringLead[index]['statusid']}',
                                             isRefresh: true,
                                           );
@@ -959,6 +966,7 @@ class _LeadListScreenState extends State<LeadListScreen> {
                                                                       );
                                                                       leadProvider.getLeadPro(
                                                                         '',
+                                                                        '',
                                                                         isRefresh:
                                                                             true,
                                                                       );
@@ -1479,6 +1487,7 @@ class _LeadListScreenState extends State<LeadListScreen> {
                                                     );
                                                     leadProvider.getLeadPro(
                                                       '',
+                                                      '',
                                                       isRefresh: true,
                                                     );
                                                   }
@@ -1858,6 +1867,7 @@ class _AddMeetingShaduleWidgetState extends State<AddMeetingShaduleWidget> {
                                             );
                                         widget.provider.getLeadPro(
                                           '',
+                                          '',
                                           isRefresh: true,
                                         );
                                         showSuccessDialog(
@@ -2095,7 +2105,7 @@ class _MeetingCardState extends State<MeetingCard> {
                           "Success",
                           widget.leadProvider.success!.message.toString(),
                         );
-                        widget.leadProvider.getLeadPro('', isRefresh: true);
+                        widget.leadProvider.getLeadPro('', '', isRefresh: true);
                       }
                     },
                     textMain: "Delete Meeting",

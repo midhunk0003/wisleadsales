@@ -4,6 +4,7 @@ import 'package:wisdeals/app_update_version.dart/app_update_version_repository.d
 import 'package:wisdeals/app_update_version.dart/app_update_versionn_repository_impli.dart';
 import 'package:wisdeals/data/repository_implimentation/attendance_leave_repository_impli.dart';
 import 'package:wisdeals/data/repository_implimentation/auth_repository_implimentation.dart';
+import 'package:wisdeals/data/repository_implimentation/business_repository_impli.dart';
 import 'package:wisdeals/data/repository_implimentation/expanse_repository_impli.dart';
 import 'package:wisdeals/data/repository_implimentation/home_repository_impli.dart';
 import 'package:wisdeals/data/repository_implimentation/lead_managment_repository_impli.dart';
@@ -13,6 +14,7 @@ import 'package:wisdeals/data/repository_implimentation/profile_repository_impli
 import 'package:wisdeals/data/repository_implimentation/report_repository_impli.dart';
 import 'package:wisdeals/domain/repository/attendance_and_leave_repository.dart';
 import 'package:wisdeals/domain/repository/auth_repository.dart';
+import 'package:wisdeals/domain/repository/business_repository.dart';
 import 'package:wisdeals/domain/repository/expanse_repository.dart';
 import 'package:wisdeals/domain/repository/home_repository.dart';
 import 'package:wisdeals/domain/repository/lead_managment_repository.dart';
@@ -21,6 +23,7 @@ import 'package:wisdeals/domain/repository/order_and_client_repository.dart';
 import 'package:wisdeals/domain/repository/profile_repository.dart';
 import 'package:wisdeals/domain/repository/report_repository.dart';
 import 'package:wisdeals/presentation/provider/auth_provider.dart';
+import 'package:wisdeals/presentation/provider/business_provider.dart';
 import 'package:wisdeals/presentation/provider/expanse_provider.dart';
 import 'package:wisdeals/presentation/provider/home_provider.dart';
 import 'package:wisdeals/presentation/provider/lead_provider.dart';
@@ -146,5 +149,15 @@ void setUpDependenceInjection() {
     () => NotificationProvider(
       notificationRepository: getIt<NotificationRepository>(),
     ),
+  );
+
+  //  Business
+  getIt.registerLazySingleton<BusinessRepository>(
+    () => BusinessRepositoryImpli(),
+  );
+  // Business provider
+  // This is where we register our provider
+  getIt.registerLazySingleton<BusinessProvider>(
+    () => BusinessProvider(businessRepository: getIt<BusinessRepository>()),
   );
 }

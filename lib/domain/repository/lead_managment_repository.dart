@@ -24,6 +24,7 @@ abstract class LeadManagmentRepository {
 
   Future<Either<Failure, LeadManagmentModel>> getLead(
     String? token,
+    String? search,
     String? leadStatusId,
     String? currentPage,
   );
