@@ -149,7 +149,7 @@ class _SplashScreenState extends State<SplashScreen>
                       child: FadeTransition(
                         opacity: _animaton,
                         child: Text(
-                          'WISLEAD',
+                          'Wteams',
                           style: TextStyle(
                             color: kTextColorPrimary,
                             fontWeight: FontWeight.bold,

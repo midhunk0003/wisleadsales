@@ -318,397 +318,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   profileProvider.profileDatas!.docVerified ??
                                       false,
                                 ),
-
-                                SizedBox(height: 40),
-
-                                ProfileGroupingWidget(
-                                  icon: Icons.insert_chart_outlined_rounded,
-                                  text: "Project report",
-                                  onTap: () {
-                                    print('project report');
-                                    profileProvider.toggleProject();
-                                  },
-                                  dropDownIcon:
-                                      profileProvider.showProject
-                                          ? Icons.keyboard_arrow_up
-                                          : Icons.keyboard_arrow_down,
-                                ),
-
-                                // // form Container
-                                // Project Report
-                                AnimatedContainer(
-                                  duration: const Duration(milliseconds: 400),
-                                  curve: Curves.easeInOut,
-                                  margin: const EdgeInsets.only(top: 10),
-                                  padding:
-                                      profileProvider.showProject
-                                          ? const EdgeInsets.all(14)
-                                          : EdgeInsets.zero,
-                                  decoration: BoxDecoration(
-                                    color: kButtonColor2.withOpacity(0.05),
-                                    borderRadius: BorderRadius.circular(14),
-                                    border: Border.all(
-                                      color: kButtonColor2.withOpacity(0.15),
-                                    ),
-                                  ),
-
-                                  /// Height animation
-                                  height:
-                                      profileProvider.showProject ? null : 0,
-                                  child: AnimatedCrossFade(
-                                    duration: const Duration(milliseconds: 300),
-                                    crossFadeState:
-                                        profileProvider.showProject
-                                            ? CrossFadeState.showSecond
-                                            : CrossFadeState.showFirst,
-
-                                    firstChild: const SizedBox(),
-                                    secondChild: Container(
-                                      width: double.infinity,
-                                      decoration: BoxDecoration(
-                                        color: Colors.transparent,
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          /// Year Selection Row - Rich UI
-                                          Container(
-                                            padding: const EdgeInsets.all(14),
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.black
-                                                      .withOpacity(.05),
-                                                  blurRadius: 10,
-                                                  offset: const Offset(0, 4),
-                                                ),
-                                              ],
-                                            ),
-                                            child: Row(
-                                              children: [
-                                                /// Left Title Section
-                                                Expanded(
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Text(
-                                                        "Select Year",
-                                                        style: TextStyle(
-                                                          fontSize: 13,
-                                                          color:
-                                                              Colors
-                                                                  .grey
-                                                                  .shade600,
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                        ),
-                                                      ),
-                                                      const SizedBox(height: 4),
-                                                      Text(
-                                                        "Choose report year",
-                                                        style: TextStyle(
-                                                          fontSize: 15,
-                                                          fontWeight:
-                                                              FontWeight.w700,
-                                                          color:
-                                                              Colors
-                                                                  .grey
-                                                                  .shade900,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-
-                                                /// Right Dropdown Section
-                                                Consumer<ProfileProvider>(
-                                                  builder: (
-                                                    context,
-                                                    profileProvider,
-                                                    _,
-                                                  ) {
-                                                    return Container(
-                                                      padding:
-                                                          const EdgeInsets.symmetric(
-                                                            horizontal: 14,
-                                                            vertical: 4,
-                                                          ),
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius.circular(
-                                                              30,
-                                                            ),
-                                                        gradient: LinearGradient(
-                                                          colors: [
-                                                            kButtonColor2
-                                                                .withOpacity(
-                                                                  .15,
-                                                                ),
-                                                            kButtonColor2
-                                                                .withOpacity(
-                                                                  .05,
-                                                                ),
-                                                          ],
-                                                        ),
-                                                        border: Border.all(
-                                                          color: kButtonColor2
-                                                              .withOpacity(.4),
-                                                        ),
-                                                      ),
-                                                      child: Row(
-                                                        children: [
-                                                          Icon(
-                                                            Icons
-                                                                .calendar_today_rounded,
-                                                            size: 18,
-                                                            color:
-                                                                kButtonColor2,
-                                                          ),
-                                                          const SizedBox(
-                                                            width: 8,
-                                                          ),
-
-                                                          DropdownButtonHideUnderline(
-                                                            child: DropdownButton<
-                                                              int
-                                                            >(
-                                                              value:
-                                                                  profileProvider
-                                                                      .selectedYear,
-                                                              icon: Icon(
-                                                                Icons
-                                                                    .keyboard_arrow_down_rounded,
-                                                                color:
-                                                                    kButtonColor2,
-                                                              ),
-                                                              style: TextStyle(
-                                                                fontSize: 14,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w600,
-                                                                color:
-                                                                    Colors
-                                                                        .grey
-                                                                        .shade900,
-                                                              ),
-                                                              items:
-                                                                  profileProvider
-                                                                      .yearList
-                                                                      .map(
-                                                                        (
-                                                                          year,
-                                                                        ) => DropdownMenuItem<
-                                                                          int
-                                                                        >(
-                                                                          value:
-                                                                              year,
-                                                                          child: Text(
-                                                                            year.toString(),
-                                                                          ),
-                                                                        ),
-                                                                      )
-                                                                      .toList(),
-                                                              onChanged: (
-                                                                value,
-                                                              ) {
-                                                                if (value !=
-                                                                    null) {
-                                                                  profileProvider
-                                                                      .changeYear(
-                                                                        value,
-                                                                      );
-
-                                                                  /// API Call
-                                                                  profileProvider
-                                                                      .getMonthYearReportPro(
-                                                                        value
-                                                                            .toString(),
-                                                                      );
-
-                                                                  print(
-                                                                    "Selected Year : $value",
-                                                                  );
-                                                                }
-                                                              },
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    );
-                                                  },
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-
-                                          ListView.builder(
-                                            padding: EdgeInsets.zero,
-                                            shrinkWrap: true,
-                                            physics:
-                                                NeverScrollableScrollPhysics(),
-                                            itemCount:
-                                                profileProvider
-                                                    .listOfMonthTarger!
-                                                    .length,
-                                            itemBuilder: (context, index) {
-                                              final data =
-                                                  profileProvider
-                                                      .listOfMonthTarger![index];
-                                              final target =
-                                                  (data.targetAmount ?? 0)
-                                                      .toDouble();
-                                              final achieved =
-                                                  (data.achievedAmount ?? 0)
-                                                      .toDouble();
-
-                                              final progress =
-                                                  target == 0
-                                                      ? 0
-                                                      : achieved / target;
-                                              final status = profileProvider
-                                                  .getAchievementStatus(
-                                                    data.achievedAmount!
-                                                        .toDouble(),
-                                                    data.targetAmount!
-                                                        .toDouble(),
-                                                  );
-
-                                              return Container(
-                                                margin: const EdgeInsets.only(
-                                                  bottom: 14,
-                                                ),
-                                                padding: const EdgeInsets.all(
-                                                  14,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  color: const Color(
-                                                    0xff1C1C1E,
-                                                  ),
-                                                  borderRadius:
-                                                      BorderRadius.circular(14),
-                                                ),
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    /// Top Row → Month + %
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        Text(
-                                                          data.month!,
-                                                          style: const TextStyle(
-                                                            fontFamily:
-                                                                "MontrealSerial",
-                                                            color: Colors.white,
-                                                            fontSize: 14,
-                                                            fontWeight:
-                                                                FontWeight.w600,
-                                                          ),
-                                                        ),
-                                                        Text(
-                                                          "${(progress * 100).toStringAsFixed(0)}%",
-                                                          style: const TextStyle(
-                                                            color:
-                                                                Colors.white70,
-                                                            fontSize: 12,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-
-                                                    const SizedBox(height: 10),
-
-                                                    /// Progress Bar
-                                                    ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                            10,
-                                                          ),
-                                                      child:
-                                                          AnimatedProgressBar(
-                                                            value:
-                                                                progress
-                                                                    .toDouble(),
-                                                          ),
-                                                    ),
-
-                                                    const SizedBox(height: 10),
-
-                                                    /// Amount Row
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        Text(
-                                                          "Target : ₹${data.targetAmount!.toStringAsFixed(0)}",
-                                                          style: const TextStyle(
-                                                            color:
-                                                                Colors.white60,
-                                                            fontSize: 11,
-                                                          ),
-                                                        ),
-                                                        Text(
-                                                          "Achieved : ₹${data.achievedAmount!.toStringAsFixed(0)}",
-                                                          style:
-                                                              const TextStyle(
-                                                                color:
-                                                                    Colors
-                                                                        .white,
-                                                                fontSize: 11,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w500,
-                                                              ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    const SizedBox(height: 10),
-                                                    // ststus row
-                                                    Row(
-                                                      children: [
-                                                        Icon(
-                                                          status["icon"],
-                                                          color:
-                                                              status["color"],
-                                                          size: 18,
-                                                        ),
-                                                        const SizedBox(
-                                                          width: 6,
-                                                        ),
-                                                        Text(
-                                                          status["text"],
-                                                          style: TextStyle(
-                                                            color:
-                                                                status["color"],
-                                                            fontSize: 12,
-                                                            fontWeight:
-                                                                FontWeight.w600,
-                                                            fontFamily:
-                                                                "MontrealSerial",
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ],
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
+                                SizedBox(height: 20),
+                                kycInfoMessageCard(),
+                                SizedBox(height: 20),
 
                                 /// 2️⃣ Profile
                                 ProfileGroupingWidget(
@@ -723,8 +335,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           ? Icons.keyboard_arrow_up
                                           : Icons.keyboard_arrow_down,
                                 ),
-
-                                // // form Container
                                 // profile section
                                 AnimatedContainer(
                                   duration: const Duration(milliseconds: 400),
@@ -811,11 +421,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                   ),
                                 ),
+                                SizedBox(height: 5),
 
                                 /// 3️⃣ Document Upload
                                 ProfileGroupingWidget(
                                   icon: Icons.upload_file_outlined,
-                                  text: "Document & Bank",
+                                  text: "KYC Documents",
                                   onTap: () {
                                     print('Document Upload');
                                     profileProvider.toggleDocument();
@@ -825,8 +436,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           ? Icons.keyboard_arrow_up
                                           : Icons.keyboard_arrow_down,
                                 ),
-
-                                // // form Container
                                 // Document and bank details section
                                 AnimatedContainer(
                                   duration: const Duration(milliseconds: 400),
@@ -1284,6 +893,394 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                   ),
                                 ),
+                                SizedBox(height: 5),
+                                // business
+                                ProfileGroupingWidget(
+                                  icon: Icons.insert_chart_outlined_rounded,
+                                  text: "My Business",
+                                  onTap: () {
+                                    profileProvider.toggleProject();
+                                  },
+                                  dropDownIcon:
+                                      profileProvider.showProject
+                                          ? Icons.keyboard_arrow_up
+                                          : Icons.keyboard_arrow_down,
+                                ),
+
+                                // business
+                                AnimatedContainer(
+                                  duration: const Duration(milliseconds: 400),
+                                  curve: Curves.easeInOut,
+                                  margin: const EdgeInsets.only(top: 10),
+                                  padding:
+                                      profileProvider.showProject
+                                          ? const EdgeInsets.all(14)
+                                          : EdgeInsets.zero,
+                                  decoration: BoxDecoration(
+                                    color: kButtonColor2.withOpacity(0.05),
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(
+                                      color: kButtonColor2.withOpacity(0.15),
+                                    ),
+                                  ),
+
+                                  /// Height animation
+                                  height:
+                                      profileProvider.showProject ? null : 0,
+                                  child: AnimatedCrossFade(
+                                    duration: const Duration(milliseconds: 300),
+                                    crossFadeState:
+                                        profileProvider.showProject
+                                            ? CrossFadeState.showSecond
+                                            : CrossFadeState.showFirst,
+
+                                    firstChild: const SizedBox(),
+                                    secondChild: Container(
+                                      width: double.infinity,
+                                      decoration: BoxDecoration(
+                                        color: Colors.transparent,
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          /// Year Selection Row - Rich UI
+                                          Container(
+                                            padding: const EdgeInsets.all(14),
+                                            decoration: BoxDecoration(
+                                              color: kButtonColor2.withOpacity(
+                                                0.5,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.black
+                                                      .withOpacity(.05),
+                                                  blurRadius: 10,
+                                                  offset: const Offset(0, 4),
+                                                ),
+                                              ],
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                /// Left Title Section
+                                                Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        "Select Year",
+                                                        style: TextStyle(
+                                                          fontSize: 13,
+                                                          color: Colors.white,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(height: 4),
+                                                      Text(
+                                                        "Choose report year",
+                                                        style: TextStyle(
+                                                          fontSize: 15,
+                                                          fontWeight:
+                                                              FontWeight.w700,
+                                                          color:
+                                                              Colors
+                                                                  .grey
+                                                                  .shade900,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+
+                                                /// Right Dropdown Section
+                                                Consumer<ProfileProvider>(
+                                                  builder: (
+                                                    context,
+                                                    profileProvider,
+                                                    _,
+                                                  ) {
+                                                    return Container(
+                                                      padding:
+                                                          const EdgeInsets.symmetric(
+                                                            horizontal: 14,
+                                                            vertical: 4,
+                                                          ),
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              30,
+                                                            ),
+                                                        gradient: LinearGradient(
+                                                          colors: [
+                                                            kButtonColor2
+                                                                .withOpacity(
+                                                                  .15,
+                                                                ),
+                                                            kButtonColor2
+                                                                .withOpacity(
+                                                                  .05,
+                                                                ),
+                                                          ],
+                                                        ),
+                                                        border: Border.all(
+                                                          color: kButtonColor2
+                                                              .withOpacity(.4),
+                                                        ),
+                                                      ),
+                                                      child: Row(
+                                                        children: [
+                                                          Icon(
+                                                            Icons
+                                                                .calendar_today_rounded,
+                                                            size: 18,
+                                                            color:
+                                                                kButtonColor2,
+                                                          ),
+                                                          const SizedBox(
+                                                            width: 8,
+                                                          ),
+
+                                                          DropdownButtonHideUnderline(
+                                                            child: DropdownButton<
+                                                              int
+                                                            >(
+                                                              value:
+                                                                  profileProvider
+                                                                      .selectedYear,
+                                                              icon: Icon(
+                                                                Icons
+                                                                    .keyboard_arrow_down_rounded,
+                                                                color:
+                                                                    kButtonColor2,
+                                                              ),
+                                                              style: TextStyle(
+                                                                fontSize: 14,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                color:
+                                                                    Colors
+                                                                        .grey
+                                                                        .shade900,
+                                                              ),
+                                                              items:
+                                                                  profileProvider
+                                                                      .yearList
+                                                                      .map(
+                                                                        (
+                                                                          year,
+                                                                        ) => DropdownMenuItem<
+                                                                          int
+                                                                        >(
+                                                                          value:
+                                                                              year,
+                                                                          child: Text(
+                                                                            year.toString(),
+                                                                          ),
+                                                                        ),
+                                                                      )
+                                                                      .toList(),
+                                                              onChanged: (
+                                                                value,
+                                                              ) {
+                                                                if (value !=
+                                                                    null) {
+                                                                  profileProvider
+                                                                      .changeYear(
+                                                                        value,
+                                                                      );
+
+                                                                  /// API Call
+                                                                  profileProvider
+                                                                      .getMonthYearReportPro(
+                                                                        value
+                                                                            .toString(),
+                                                                      );
+
+                                                                  print(
+                                                                    "Selected Year : $value",
+                                                                  );
+                                                                }
+                                                              },
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+
+                                          SizedBox(height: 10),
+                                          ListView.builder(
+                                            padding: EdgeInsets.zero,
+                                            shrinkWrap: true,
+                                            physics:
+                                                NeverScrollableScrollPhysics(),
+                                            itemCount:
+                                                profileProvider
+                                                    .listOfMonthTarger!
+                                                    .length,
+                                            itemBuilder: (context, index) {
+                                              final data =
+                                                  profileProvider
+                                                      .listOfMonthTarger![index];
+                                              final target =
+                                                  (data.targetAmount ?? 0)
+                                                      .toDouble();
+                                              final achieved =
+                                                  (data.achievedAmount ?? 0)
+                                                      .toDouble();
+
+                                              final progress =
+                                                  target == 0
+                                                      ? 0
+                                                      : achieved / target;
+                                              final status = profileProvider
+                                                  .getAchievementStatus(
+                                                    data.achievedAmount!
+                                                        .toDouble(),
+                                                    data.targetAmount!
+                                                        .toDouble(),
+                                                  );
+
+                                              return Container(
+                                                margin: const EdgeInsets.only(
+                                                  bottom: 14,
+                                                ),
+                                                padding: const EdgeInsets.all(
+                                                  14,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  color: const Color(
+                                                    0xff1C1C1E,
+                                                  ),
+                                                  borderRadius:
+                                                      BorderRadius.circular(14),
+                                                ),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    /// Top Row → Month + %
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Text(
+                                                          data.month!,
+                                                          style: const TextStyle(
+                                                            fontFamily:
+                                                                "MontrealSerial",
+                                                            color: Colors.white,
+                                                            fontSize: 14,
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          "${(progress * 100).toStringAsFixed(0)}%",
+                                                          style: const TextStyle(
+                                                            color:
+                                                                Colors.white70,
+                                                            fontSize: 12,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+
+                                                    const SizedBox(height: 10),
+
+                                                    /// Progress Bar
+                                                    ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            10,
+                                                          ),
+                                                      child:
+                                                          AnimatedProgressBar(
+                                                            value:
+                                                                progress
+                                                                    .toDouble(),
+                                                          ),
+                                                    ),
+
+                                                    const SizedBox(height: 10),
+
+                                                    /// Amount Row
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Text(
+                                                          "Target : ₹${data.targetAmount!.toStringAsFixed(0)}",
+                                                          style: const TextStyle(
+                                                            color:
+                                                                Colors.white60,
+                                                            fontSize: 11,
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          "Achieved : ₹${data.achievedAmount!.toStringAsFixed(0)}",
+                                                          style:
+                                                              const TextStyle(
+                                                                color:
+                                                                    Colors
+                                                                        .white,
+                                                                fontSize: 11,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                              ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    const SizedBox(height: 10),
+                                                    // ststus row
+                                                    Row(
+                                                      children: [
+                                                        Icon(
+                                                          status["icon"],
+                                                          color:
+                                                              status["color"],
+                                                          size: 18,
+                                                        ),
+                                                        const SizedBox(
+                                                          width: 6,
+                                                        ),
+                                                        Text(
+                                                          status["text"],
+                                                          style: TextStyle(
+                                                            color:
+                                                                status["color"],
+                                                            fontSize: 12,
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                            fontFamily:
+                                                                "MontrealSerial",
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
 
                                 SizedBox(height: 100),
                                 // save changes
@@ -1356,6 +1353,47 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         );
                                         profileProvider.clearFailure();
                                         profileProvider.clearSelectedImages();
+                                      }
+                                    } else {
+                                      if (profileProvider.showDocument ==
+                                          true) {
+                                        print('validation is there in ');
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            behavior: SnackBarBehavior.floating,
+                                            margin: const EdgeInsets.all(16),
+                                            backgroundColor: Colors.black87,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(14),
+                                            ),
+                                            duration: const Duration(
+                                              seconds: 2,
+                                            ),
+                                            content: Row(
+                                              children: [
+                                                Icon(
+                                                  Icons.warning_amber_rounded,
+                                                  color: Color(0xFFD1F66F),
+                                                ),
+                                                const SizedBox(width: 12),
+                                                const Expanded(
+                                                  child: Text(
+                                                    "Please submit all required documents and bank details",
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      } else {
+                                        profileProvider.toggleDocument();
                                       }
                                     }
                                   },
@@ -1560,6 +1598,80 @@ Widget documentStatusChip(bool? isVerified) {
             color: mainColor,
             letterSpacing: 0.3,
             fontFamily: "MontrealSerial",
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+Widget kycInfoMessageCard() {
+  const warningColor = Color(0xFFFFB020); // Warning Amber (you can change)
+
+  return Container(
+    margin: const EdgeInsets.only(top: 14), // ↓ Reduced margin
+    padding: const EdgeInsets.symmetric(
+      horizontal: 12,
+      vertical: 10,
+    ), // ↓ Smaller padding
+
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        /// ⚠️ Icon Badge
+        Container(
+          padding: const EdgeInsets.all(6), // ↓ Smaller
+          decoration: BoxDecoration(
+            color: warningColor.withOpacity(.18),
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(
+            Icons.warning_amber_rounded, // Warning icon
+            color: warningColor,
+            size: 10, // ↓ Smaller icon
+          ),
+        ),
+
+        const SizedBox(width: 10),
+
+        /// Message
+        Expanded(
+          child: RichText(
+            text: const TextSpan(
+              style: TextStyle(
+                fontFamily: "MontrealSerial",
+                fontSize: 10, // ↓ Smaller text
+                color: Colors.white70,
+                height: 1.4,
+              ),
+              children: [
+                TextSpan(text: "After updating your "),
+                TextSpan(
+                  text: "Profile Image",
+                  style: TextStyle(
+                    color: warningColor,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                TextSpan(text: " and "),
+                TextSpan(
+                  text: "KYC Documents",
+                  style: TextStyle(
+                    color: warningColor,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                TextSpan(text: ", don’t forget to click the "),
+                TextSpan(
+                  text: "Update Button",
+                  style: TextStyle(
+                    color: warningColor,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                TextSpan(text: " below to save your changes.."),
+              ],
+            ),
           ),
         ),
       ],

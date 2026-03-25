@@ -203,182 +203,123 @@ class _BusinessScreenState extends State<BusinessScreen> {
                             Row(
                               children: [
                                 Expanded(
-                                  child: Container(
-                                    padding: const EdgeInsets.all(12),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(14),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.06),
-                                          blurRadius: 10,
-                                          offset: const Offset(0, 4),
+                                  child: Row(
+                                    children: [
+                                      /// 📅 Month Dropdown (Short form)
+                                      Expanded(
+                                        child: CustomListDropdown<String>(
+                                          label: "Month",
+                                          icon: Icons.calendar_month_outlined,
+                                          value: businessProvider.selectedMonth,
+                                          items:
+                                              businessProvider
+                                                  .months, // ["Jan","Feb","Mar"...]
+                                          onSelected: (value) async {},
+                                          showHideTap: () {
+                                            businessProvider
+                                                .showMonthMainScreenPro();
+                                          },
+                                          iconArrow:
+                                              businessProvider
+                                                      .showMonthInMainScreen
+                                                  ? Icons.keyboard_arrow_up
+                                                  : Icons.keyboard_arrow_down,
                                         ),
-                                      ],
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        /// 📅 Month Dropdown
-                                        Expanded(
-                                          child: DropdownButtonFormField<
-                                            String
-                                          >(
-                                            value:
-                                                businessProvider.selectedMonth,
-                                            isExpanded: true,
-                                            icon: const Icon(
-                                              Icons.keyboard_arrow_down_rounded,
-                                            ),
-                                            decoration: InputDecoration(
-                                              labelText: "Month",
-                                              prefixIcon: const Icon(
-                                                Icons.calendar_month,
-                                              ),
-                                              filled: true,
-                                              fillColor: Colors.grey.shade100,
-                                              contentPadding:
-                                                  const EdgeInsets.symmetric(
-                                                    horizontal: 12,
-                                                    vertical: 14,
-                                                  ),
-                                              border: OutlineInputBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                                borderSide: BorderSide.none,
-                                              ),
-                                            ),
-                                            items:
-                                                businessProvider.months
-                                                    .map(
-                                                      (
-                                                        month,
-                                                      ) => DropdownMenuItem(
-                                                        value: month,
-                                                        child: Text(
-                                                          month,
-                                                          style:
-                                                              const TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w500,
-                                                              ),
-                                                        ),
-                                                      ),
-                                                    )
-                                                    .toList(),
-                                            onChanged: (value) async {
-                                              if (value != null) {
-                                                businessProvider.changeMonth(
-                                                  value,
-                                                );
+                                      ),
 
-                                                print(
-                                                  'month... ${(businessProvider.selectedConvertedMonth)}',
-                                                );
-                                                print(
-                                                  'year... ${businessProvider.selectedYear.toString()}',
-                                                );
-                                                await businessProvider
-                                                    .getAllBusinessListPro(
-                                                      businessProvider
-                                                          .selectedConvertedMonth,
-                                                      businessProvider
-                                                          .selectedYear
-                                                          .toString(),
-                                                      '',
-                                                      '',
-                                                      isRefresh: true,
-                                                    );
-                                              }
-                                            },
+                                      const SizedBox(width: 8),
+
+                                      /// 📆 Year Dropdown
+                                      Expanded(
+                                        child: CustomListDropdown<int>(
+                                          label: "Year",
+                                          icon: Icons.date_range_outlined,
+                                          value: int.tryParse(
+                                            businessProvider.selectedYear
+                                                .toString(),
                                           ),
+                                          items: businessProvider.years,
+                                          onSelected: (value) async {},
+                                          showHideTap: () {
+                                            businessProvider
+                                                .showYearMainScreenPro();
+                                          },
+                                          iconArrow:
+                                              businessProvider
+                                                      .showyearInMainScreen
+                                                  ? Icons.keyboard_arrow_up
+                                                  : Icons.keyboard_arrow_down,
                                         ),
-
-                                        const SizedBox(width: 12),
-
-                                        /// 📆 Year Dropdown
-                                        Expanded(
-                                          child: DropdownButtonFormField<int>(
-                                            value: int.tryParse(
-                                              businessProvider.selectedYear
-                                                  .toString(),
-                                            ),
-                                            isExpanded: true,
-                                            icon: const Icon(
-                                              Icons.keyboard_arrow_down_rounded,
-                                            ),
-                                            decoration: InputDecoration(
-                                              labelText: "Year",
-                                              prefixIcon: const Icon(
-                                                Icons.date_range,
-                                              ),
-                                              filled: true,
-                                              fillColor: Colors.grey.shade100,
-                                              contentPadding:
-                                                  const EdgeInsets.symmetric(
-                                                    horizontal: 12,
-                                                    vertical: 14,
-                                                  ),
-                                              border: OutlineInputBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                                borderSide: BorderSide.none,
-                                              ),
-                                            ),
-                                            items:
-                                                businessProvider.years
-                                                    .map(
-                                                      (
-                                                        year,
-                                                      ) => DropdownMenuItem(
-                                                        value: year,
-                                                        child: Text(
-                                                          year.toString(),
-                                                          style:
-                                                              const TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w500,
-                                                              ),
-                                                        ),
-                                                      ),
-                                                    )
-                                                    .toList(),
-                                            onChanged: (value) async {
-                                              if (value != null) {
-                                                businessProvider.changeYear(
-                                                  value.toString(),
-                                                );
-
-                                                print(
-                                                  'month... ${(businessProvider.selectedConvertedMonth)}',
-                                                );
-                                                print(
-                                                  'year... ${businessProvider.selectedYear.toString()}',
-                                                );
-                                                await businessProvider
-                                                    .getAllBusinessListPro(
-                                                      businessProvider
-                                                          .selectedConvertedMonth,
-                                                      businessProvider
-                                                          .selectedYear
-                                                          .toString(),
-                                                      '',
-                                                      '',
-                                                      isRefresh: true,
-                                                    );
-                                              }
-                                            },
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
                                 ),
+
                                 const SizedBox(width: 12),
                                 FavAndAddWidget(isTablet: isTablet),
                               ],
                             ),
+                            SizedBox(height: 10),
+                            // expand month and year portion
+                            if (businessProvider.showMonthInMainScreen ||
+                                businessProvider.showyearInMainScreen)
+                              Row(
+                                children: [
+                                  /// Month List
+                                  Expanded(
+                                    child:
+                                        businessProvider.showMonthInMainScreen
+                                            ? _DropdownList<String>(
+                                              items: businessProvider.months,
+                                              onTap: (value) async {
+                                                businessProvider.changeMonth(
+                                                  value,
+                                                );
+                                                businessProvider.hideAll();
+                                                await businessProvider
+                                                    .getAllBusinessListPro(
+                                                      businessProvider
+                                                          .selectedConvertedMonth,
+                                                      businessProvider
+                                                          .selectedYear
+                                                          .toString(),
+                                                      '',
+                                                      '',
+                                                      isRefresh: true,
+                                                    );
+                                              },
+                                            )
+                                            : const SizedBox(),
+                                  ),
+
+                                  /// Year List
+                                  Expanded(
+                                    child:
+                                        businessProvider.showyearInMainScreen
+                                            ? _DropdownList<int>(
+                                              items: businessProvider.years,
+                                              onTap: (value) async {
+                                                businessProvider.changeYear(
+                                                  value.toString(),
+                                                );
+                                                businessProvider.hideAll();
+                                                await businessProvider
+                                                    .getAllBusinessListPro(
+                                                      businessProvider
+                                                          .selectedConvertedMonth,
+                                                      businessProvider
+                                                          .selectedYear
+                                                          .toString(),
+                                                      '',
+                                                      '',
+                                                      isRefresh: true,
+                                                    );
+                                              },
+                                            )
+                                            : const SizedBox(),
+                                  ),
+                                ],
+                              ),
 
                             const SizedBox(height: 20),
 
@@ -531,37 +472,56 @@ class _BusinessScreenState extends State<BusinessScreen> {
                                             businessProvider
                                                 .businessAllListData!
                                                 .isEmpty)
-                                        ? Center(
-                                          child: Container(
-                                            child: SingleChildScrollView(
-                                              child: Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  Lottie.asset(
-                                                    'assets/json/noevents.json',
-                                                    width: 150,
-                                                  ),
-                                                  const SizedBox(height: 10),
-                                                  const Text(
-                                                    'No Business Found',
-                                                    style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 16,
+                                        ? RefreshIndicator(
+                                          onRefresh: () async {
+                                            // // Call your API / Provider refresh function here
+                                            // await businessProvider
+                                            //     .getBusinessList();
+                                            _initialData();
+                                          },
+                                          child: SingleChildScrollView(
+                                            physics:
+                                                const AlwaysScrollableScrollPhysics(),
+                                            child: SizedBox(
+                                              height:
+                                                  MediaQuery.of(
+                                                    context,
+                                                  ).size.height *
+                                                  0.7,
+                                              child: Center(
+                                                child: Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    Lottie.asset(
+                                                      'assets/json/noevents.json',
+                                                      width: 150,
                                                     ),
-                                                  ),
-                                                ],
+                                                    const SizedBox(height: 10),
+                                                    const Text(
+                                                      'No Business Found',
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 16,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                           ),
                                         )
                                         : RefreshIndicator(
                                           onRefresh: () async {
+                                            /// Call your initial API again
+
+                                            /// OR if you already use this
                                             _initialData();
                                           },
                                           child: ListView.separated(
                                             controller: scrollcontrollers,
                                             shrinkWrap: false,
-                                            physics: BouncingScrollPhysics(),
+                                            // physics: BouncingScrollPhysics(),
                                             itemCount:
                                                 businessProvider
                                                     .businessAllListData!
@@ -635,7 +595,8 @@ class _BusinessScreenState extends State<BusinessScreen> {
                                                       Container(
                                                         width: double.infinity,
                                                         decoration: BoxDecoration(
-                                                          // color: Colors.amber,
+                                                          // color:
+                                                          //     Colors.amber,
                                                         ),
 
                                                         // 2 row container
@@ -643,15 +604,9 @@ class _BusinessScreenState extends State<BusinessScreen> {
                                                           crossAxisAlignment:
                                                               CrossAxisAlignment
                                                                   .start,
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .spaceBetween,
+
                                                           children: [
-                                                            Container(
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                    // color: Colors.deepOrange,
-                                                                  ),
+                                                            Expanded(
                                                               child: Column(
                                                                 crossAxisAlignment:
                                                                     CrossAxisAlignment
@@ -659,7 +614,14 @@ class _BusinessScreenState extends State<BusinessScreen> {
 
                                                                 children: [
                                                                   Text(
-                                                                    '${allBusinessList.businessName ?? ''}',
+                                                                    allBusinessList
+                                                                            .businessName ??
+                                                                        '',
+                                                                    maxLines:
+                                                                        2, // responsive
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
                                                                     style: TextStyle(
                                                                       fontFamily:
                                                                           "MontrealSerial",
@@ -676,7 +638,13 @@ class _BusinessScreenState extends State<BusinessScreen> {
                                                                     ),
                                                                   ),
                                                                   Text(
-                                                                    '${allBusinessList.clientName ?? ''}',
+                                                                    allBusinessList
+                                                                            .clientName ??
+                                                                        '',
+                                                                    maxLines: 1,
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
                                                                     style: TextStyle(
                                                                       fontFamily:
                                                                           "MontrealSerial",
@@ -701,22 +669,18 @@ class _BusinessScreenState extends State<BusinessScreen> {
                                                                       ? 20
                                                                       : 10,
                                                             ),
-                                                            Expanded(
-                                                              child: collectionPendingANdCOloectedWidget(
-                                                                allBusinessList:
-                                                                    allBusinessList,
-                                                                isTablet:
-                                                                    isTablet,
-                                                              ),
+                                                            CollectionPendingAndCollectedWidget(
+                                                              allBusinessList:
+                                                                  allBusinessList,
                                                             ),
                                                           ],
                                                         ),
                                                       ),
+
                                                       SizedBox(height: 20),
 
                                                       // total amount container
                                                       TotalAmountWidget(
-                                                        isTablet: isTablet,
                                                         totalAmount:
                                                             allBusinessList
                                                                 .totalBusinessCost ??
@@ -809,6 +773,8 @@ class _BusinessScreenState extends State<BusinessScreen> {
                                                                       index,
                                                                     );
                                                               },
+                                                              isTablet:
+                                                                  isTablet,
                                                             ),
                                                             SizedBox(width: 5),
                                                             ContactSocialWidget(
@@ -825,6 +791,8 @@ class _BusinessScreenState extends State<BusinessScreen> {
                                                                       index,
                                                                     );
                                                               },
+                                                              isTablet:
+                                                                  isTablet,
                                                             ),
                                                             SizedBox(width: 5),
                                                             ContactSocialWidget(
@@ -867,10 +835,13 @@ class _BusinessScreenState extends State<BusinessScreen> {
                                                                       businessProvider,
                                                                 );
                                                               },
+                                                              isTablet:
+                                                                  isTablet,
                                                             ),
                                                           ],
                                                         ),
                                                       ),
+
                                                       const SizedBox(
                                                         height: 10,
                                                       ),
@@ -1177,44 +1148,46 @@ class _BusinessScreenState extends State<BusinessScreen> {
                                                                             BorderRadius.circular(
                                                                               10,
                                                                             ),
-                                                                        onTap: () async {
-                                                                          if (amountController
-                                                                              .text
-                                                                              .isEmpty) {
-                                                                            ScaffoldMessenger.of(
-                                                                              context,
-                                                                            ).showSnackBar(
-                                                                              const SnackBar(
-                                                                                content: Text(
-                                                                                  "Please enter amount",
-                                                                                ),
-                                                                                backgroundColor:
-                                                                                    Colors.red,
-                                                                                behavior:
-                                                                                    SnackBarBehavior.floating,
-                                                                              ),
-                                                                            );
-                                                                          } else {
-                                                                            /// Await the API call
-                                                                            await businessProvider.addAmountPro(
-                                                                              allBusinessList.businessId.toString(),
-                                                                              amountController.text.toString(),
-                                                                            );
-                                                                            if (!mounted)
-                                                                              return;
-                                                                            if (businessProvider.success !=
-                                                                                null) {
-                                                                              showSuccessDialog(
-                                                                                navigatorKey.currentState!.context,
-                                                                                "assets/images/successicons.png",
-                                                                                "Success",
-                                                                                "${businessProvider.success!.message}",
-                                                                              );
-                                                                              _initialData();
-                                                                              amountController.clear();
-                                                                            }
-                                                                          }
-                                                                        },
+                                                                        onTap:
+                                                                            businessProvider.loadingIndex ==
+                                                                                    index
+                                                                                ? null
+                                                                                : () async {
+                                                                                  if (amountController.text.isEmpty) {
+                                                                                    ScaffoldMessenger.of(
+                                                                                      context,
+                                                                                    ).showSnackBar(
+                                                                                      const SnackBar(
+                                                                                        content: Text(
+                                                                                          "Please enter amount",
+                                                                                        ),
+                                                                                        backgroundColor:
+                                                                                            Colors.red,
+                                                                                        behavior:
+                                                                                            SnackBarBehavior.floating,
+                                                                                      ),
+                                                                                    );
+                                                                                  } else {
+                                                                                    /// Await the API call
+                                                                                    await businessProvider.addAmountPro(
+                                                                                      allBusinessList.businessId.toString(),
+                                                                                      amountController.text.toString(),
+                                                                                      index,
+                                                                                    );
+
+                                                                                    if (!mounted) return;
+                                                                                    if (businessProvider.success !=
+                                                                                        null) {
+                                                                                      showSuccessDialog(
+                                                                                        navigatorKey.currentState!.context,
+                                                                                        "assets/images/successicons.png",
+                                                                                        "Success",
+                                                                                        "${businessProvider.success!.message}",
+                                                                                      );
+                                                                                      amountController.clear();
+                                                                                    }
+                                                                                  }
+                                                                                },
                                                                         child: Container(
                                                                           width:
                                                                               double.infinity,
@@ -1231,17 +1204,32 @@ class _BusinessScreenState extends State<BusinessScreen> {
                                                                             ),
                                                                           ),
 
-                                                                          child: const Text(
-                                                                            "Update Payment",
-                                                                            style: TextStyle(
-                                                                              fontWeight:
-                                                                                  FontWeight.w600,
-                                                                              fontSize:
-                                                                                  14,
-                                                                              color:
-                                                                                  Colors.black,
-                                                                            ),
-                                                                          ),
+                                                                          child:
+                                                                              businessProvider.loadingIndex ==
+                                                                                      index
+                                                                                  ? const SizedBox(
+                                                                                    height:
+                                                                                        20,
+                                                                                    width:
+                                                                                        20,
+                                                                                    child: CircularProgressIndicator(
+                                                                                      strokeWidth:
+                                                                                          2,
+                                                                                      color:
+                                                                                          Colors.black,
+                                                                                    ),
+                                                                                  )
+                                                                                  : const Text(
+                                                                                    "Update Payment",
+                                                                                    style: TextStyle(
+                                                                                      fontWeight:
+                                                                                          FontWeight.w600,
+                                                                                      fontSize:
+                                                                                          14,
+                                                                                      color:
+                                                                                          Colors.black,
+                                                                                    ),
+                                                                                  ),
                                                                         ),
                                                                       ),
                                                                     ],
@@ -1469,62 +1457,59 @@ class CollectedPaymentCardWidget extends StatelessWidget {
   }
 }
 
-class collectionPendingANdCOloectedWidget extends StatelessWidget {
-  const collectionPendingANdCOloectedWidget({
+class CollectionPendingAndCollectedWidget extends StatelessWidget {
+  const CollectionPendingAndCollectedWidget({
     super.key,
     required this.allBusinessList,
-    required this.isTablet,
   });
 
   final BusinessListData allBusinessList;
-  final bool isTablet;
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final width = size.width;
+
+    // 🔹 Responsive scale factor
+    double scale = width / 375; // base width (mobile design size)
+
+    // 🔹 Status check
+    final bool isPending = allBusinessList.collectionPendingStatus == 'true';
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: EdgeInsets.symmetric(
+        horizontal: 12 * scale,
+        vertical: 6 * scale,
+      ),
       decoration: BoxDecoration(
         color:
-            allBusinessList.collectionPendingStatus == 'true'
+            isPending
                 ? Colors.orange.withOpacity(0.15)
                 : Colors.green.withOpacity(0.15),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(20 * scale),
         border: Border.all(
-          color:
-              allBusinessList.collectionPendingStatus == 'true'
-                  ? Colors.orange
-                  : Colors.green,
-          width: 1,
+          color: isPending ? Colors.orange : Colors.green,
+          width: 1 * scale,
         ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
-            allBusinessList.collectionPendingStatus == 'true'
+            isPending
                 ? Icons.hourglass_top_rounded
                 : Icons.check_circle_rounded,
-            color:
-                allBusinessList.collectionPendingStatus == 'true'
-                    ? Colors.orange
-                    : Colors.green,
-            size: isTablet ? 20 : 16,
+            color: isPending ? Colors.orange : Colors.green,
+            size: 16 * scale, // 🔹 Responsive icon size
           ),
-          const SizedBox(width: 6),
-          Expanded(
-            child: Text(
-              allBusinessList.collectionPendingStatus == 'true'
-                  ? 'Collection Pending'
-                  : 'Collection Completed',
-              style: TextStyle(
-                fontFamily: "MontrealSerial",
-                color:
-                    allBusinessList.collectionPendingStatus == 'true'
-                        ? Colors.orange.shade800
-                        : Colors.green.shade800,
-                fontSize: isTablet ? 16 : 12,
-                fontWeight: FontWeight.w500,
-              ),
+          SizedBox(width: 6 * scale),
+          Text(
+            isPending ? 'Pending' : 'Collected',
+            style: TextStyle(
+              fontFamily: "MontrealSerial",
+              color: isPending ? Colors.orange.shade800 : Colors.green.shade800,
+              fontSize: 12 * scale, // 🔹 Responsive text
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],
@@ -1535,93 +1520,148 @@ class collectionPendingANdCOloectedWidget extends StatelessWidget {
 
 class TotalAmountWidget extends StatelessWidget {
   final String? totalAmount;
-  const TotalAmountWidget({
-    super.key,
-    required this.isTablet,
-    required this.totalAmount,
-  });
 
-  final bool isTablet;
+  const TotalAmountWidget({super.key, required this.totalAmount});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(
-        horizontal: isTablet ? 24 : 16,
-        vertical: isTablet ? 20 : 14,
-      ),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Color(0xFF1E3C72), Color(0xFF2A5298)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black26,
-            blurRadius: 10,
-            offset: Offset(0, 6),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+
+        /// 🔁 Responsive Breakpoints
+        final isTablet = width >= 600;
+        final isLargeTablet = width >= 900;
+
+        /// 🔁 Dynamic Sizes
+        final horizontalPadding =
+            isLargeTablet
+                ? 32.0
+                : isTablet
+                ? 24.0
+                : 16.0;
+
+        final verticalPadding =
+            isLargeTablet
+                ? 24.0
+                : isTablet
+                ? 20.0
+                : 14.0;
+
+        final iconSize =
+            isLargeTablet
+                ? 36.0
+                : isTablet
+                ? 30.0
+                : 24.0;
+
+        final trendIconSize =
+            isLargeTablet
+                ? 32.0
+                : isTablet
+                ? 26.0
+                : 22.0;
+
+        final titleFontSize =
+            isLargeTablet
+                ? 18.0
+                : isTablet
+                ? 16.0
+                : 13.0;
+
+        final amountFontSize =
+            isLargeTablet
+                ? 30.0
+                : isTablet
+                ? 26.0
+                : 20.0;
+
+        return Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(
+            horizontal: horizontalPadding,
+            vertical: verticalPadding,
           ),
-        ],
-      ),
-      child: Row(
-        children: [
-          /// 💰 Icon Container
-          Container(
-            padding: EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(.15),
-              shape: BoxShape.circle,
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFF1E3C72), Color(0xFF2A5298)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
-            child: Icon(
-              Icons.account_balance_wallet_rounded,
-              color: Colors.white,
-              size: isTablet ? 32 : 24,
-            ),
+            borderRadius: BorderRadius.circular(isTablet ? 22 : 18),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 10,
+                offset: Offset(0, 6),
+              ),
+            ],
           ),
 
-          SizedBox(width: 14),
-
-          /// 📊 Text Section
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Total Amount",
-                  style: TextStyle(
-                    fontFamily: "MontrealSerial",
-                    color: Colors.white70,
-                    fontSize: isTablet ? 16 : 13,
-                    fontWeight: FontWeight.w500,
-                  ),
+          /// 🔹 Content
+          child: Row(
+            children: [
+              /// 💰 Wallet Icon
+              Container(
+                padding: EdgeInsets.all(isTablet ? 14 : 12),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(.15),
+                  shape: BoxShape.circle,
                 ),
-
-                SizedBox(height: 4),
-
-                Text(
-                  "₹ ${totalAmount ?? ''}", // 🔁 dynamic amount here
-                  style: TextStyle(
-                    fontFamily: "MontrealSerial",
-                    color: Colors.white,
-                    fontSize: isTablet ? 26 : 20,
-                    fontWeight: FontWeight.bold,
-                  ),
+                child: Icon(
+                  Icons.account_balance_wallet_rounded,
+                  color: Colors.white,
+                  size: iconSize,
                 ),
-              ],
-            ),
-          ),
+              ),
 
-          /// 📈 Trend Icon
-          Icon(
-            Icons.trending_up_rounded,
-            color: Colors.greenAccent,
-            size: isTablet ? 28 : 22,
+              SizedBox(width: isTablet ? 18 : 14),
+
+              /// 📊 Text Section
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Total Amount",
+                      style: TextStyle(
+                        fontFamily: "MontrealSerial",
+                        color: Colors.white70,
+                        fontSize: titleFontSize,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+
+                    const SizedBox(height: 4),
+
+                    /// 💵 Amount
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "₹ ${totalAmount ?? '0'}",
+                        style: TextStyle(
+                          fontFamily: "MontrealSerial",
+                          color: Colors.white,
+                          fontSize: amountFontSize,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              /// 📈 Trend Icon
+              Icon(
+                Icons.trending_up_rounded,
+                color: Colors.greenAccent,
+                size: trendIconSize,
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -1754,39 +1794,57 @@ class ContactSocialWidget extends StatelessWidget {
   final VoidCallback onTap;
   final String? text;
   final Color? color;
+  final bool isTablet;
+
   const ContactSocialWidget({
     super.key,
     required this.image,
     required this.text,
     required this.onTap,
     this.color,
+    required this.isTablet,
   });
 
   @override
   Widget build(BuildContext context) {
+    // Responsive values
+    final iconSize = isTablet ? 36.0 : 24.0;
+    final fontSize = isTablet ? 16.0 : 12.0;
+    final verticalPadding = isTablet ? 18.0 : 10.0;
+    final horizontalPadding = isTablet ? 28.0 : 20.0;
+    final borderRadius = isTablet ? 16.0 : 10.0;
     return InkWell(
       onTap: onTap,
+      borderRadius: BorderRadius.circular(borderRadius),
       child: Container(
-        // width: 80,
-        // height: 65,
         decoration: BoxDecoration(
-          color: color,
+          color: color ?? Colors.transparent,
           border: Border.all(color: Colors.grey),
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(borderRadius),
         ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+          padding: EdgeInsets.symmetric(
+            vertical: verticalPadding,
+            horizontal: horizontalPadding,
+          ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Image.asset('${image}', width: 24, height: 24),
-              SizedBox(height: 3),
+              Image.asset(
+                image ?? '',
+                width: iconSize,
+                height: iconSize,
+                fit: BoxFit.contain,
+              ),
+              SizedBox(height: isTablet ? 8 : 3),
               Text(
-                '${text}',
+                text ?? '',
+                textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: "MontrealSerial",
                   color: Colors.white,
-                  fontSize: 12,
+                  fontSize: fontSize,
                   fontWeight: FontWeight.w300,
                 ),
               ),
@@ -1833,4 +1891,197 @@ Widget _buildItem({
       ),
     ],
   );
+}
+
+class CustomListDropdown<T> extends StatefulWidget {
+  final String label;
+  final IconData icon;
+  final IconData iconArrow;
+  final T? value;
+  final List<T> items;
+  final Function(T value) onSelected;
+  final VoidCallback showHideTap;
+
+  const CustomListDropdown({
+    super.key,
+    required this.label,
+    required this.icon,
+    required this.iconArrow,
+    required this.value,
+    required this.items,
+    required this.onSelected,
+    required this.showHideTap,
+  });
+
+  @override
+  State<CustomListDropdown<T>> createState() => _CustomListDropdownState<T>();
+}
+
+class _CustomListDropdownState<T> extends State<CustomListDropdown<T>> {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        /// Field UI
+        GestureDetector(
+          onTap: widget.showHideTap,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: Colors.grey.shade300),
+            ),
+            child: Row(
+              children: [
+                Icon(widget.icon, size: 20, color: Colors.grey.shade600),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    widget.value?.toString() ?? "Select ${widget.label}",
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+
+                Icon(widget.iconArrow, color: Colors.white),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _DropdownList<T> extends StatelessWidget {
+  final List<T> items;
+  final Function(T value) onTap;
+  final T? selectedValue;
+
+  const _DropdownList({
+    required this.items,
+    required this.onTap,
+    this.selectedValue,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 350),
+      curve: Curves.easeInOut,
+      height: 220,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(.06),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: ListView.separated(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          physics: const BouncingScrollPhysics(),
+          itemCount: items.length,
+          separatorBuilder:
+              (_, __) => Divider(height: 1, color: Colors.grey.shade100),
+
+          itemBuilder: (context, index) {
+            final item = items[index];
+            final isSelected = item == selectedValue;
+
+            return Material(
+              color:
+                  isSelected
+                      ? Colors.blue.withOpacity(.08)
+                      : Colors.transparent,
+
+              child: InkWell(
+                onTap: () => onTap(item),
+                splashColor: Colors.blue.withOpacity(.15),
+                highlightColor: Colors.blue.withOpacity(.05),
+
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 14,
+                  ),
+
+                  child: Row(
+                    children: [
+                      /// 🔹 Leading Icon / Avatar
+                      Container(
+                        height: 36,
+                        width: 36,
+                        decoration: BoxDecoration(
+                          color: Colors.blue.withOpacity(.1),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(
+                          Icons.calendar_month_rounded,
+                          size: 18,
+                          color: Colors.blue,
+                        ),
+                      ),
+
+                      const SizedBox(width: 12),
+
+                      /// 🔹 Title + Subtitle
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              item.toString(),
+                              style: TextStyle(
+                                fontSize: 14.5,
+                                fontWeight:
+                                    isSelected
+                                        ? FontWeight.w600
+                                        : FontWeight.w500,
+                                color:
+                                    isSelected ? Colors.blue : Colors.black87,
+                              ),
+                            ),
+
+                            const SizedBox(height: 2),
+
+                            Text(
+                              "Select ${item.toString()}",
+                              style: TextStyle(
+                                fontSize: 11.5,
+                                color: Colors.grey.shade500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      /// 🔹 Selected Check Icon
+                      if (isSelected)
+                        const Icon(
+                          Icons.check_circle_rounded,
+                          color: Colors.blue,
+                          size: 20,
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
 }

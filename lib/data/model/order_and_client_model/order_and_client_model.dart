@@ -6,8 +6,9 @@ part 'order_and_client_model.g.dart';
 class OrderAndClientModel {
   bool? success;
   List<Clients>? data;
+  int? total;
 
-  OrderAndClientModel({this.success, this.data});
+  OrderAndClientModel({this.success, this.data, this.total});
 
   factory OrderAndClientModel.fromJson(Map<String, dynamic> json) {
     return _$OrderAndClientModelFromJson(json);

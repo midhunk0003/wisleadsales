@@ -75,7 +75,7 @@ class MeetingProvider extends ChangeNotifier {
       (success) {
         _isLoading = false;
         _clientList =
-            success.where((data) {
+            success.data?.where((data) {
               return data.meetings!.isNotEmpty;
             }).toList();
         _totalClient = _clientList!.length.toString();

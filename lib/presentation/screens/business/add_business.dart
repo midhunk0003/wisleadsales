@@ -25,6 +25,8 @@ class _AddBusinessState extends State<AddBusiness> {
   final TextEditingController businessTypeTextController =
       TextEditingController();
   final TextEditingController searchController = TextEditingController();
+  final TextEditingController searchBusinessController =
+      TextEditingController();
   final ScrollController scrollcontrollers = ScrollController();
 
   @override
@@ -38,8 +40,8 @@ class _AddBusinessState extends State<AddBusiness> {
   void _initialData() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = Provider.of<BusinessProvider>(context, listen: false);
-      provider.getBusinessClientNamePro(isRefresh: true);
-      provider.getBusinessNamePro();
+      provider.getBusinessClientNamePro('', isRefresh: true);
+      provider.getBusinessNamePro('');
     });
   }
 
@@ -53,7 +55,7 @@ class _AddBusinessState extends State<AddBusiness> {
       print('111111111111111');
       if (!businessProvider.isLoadingMore && businessProvider.hasMore) {
         print('listening  and index name');
-        businessProvider.getBusinessClientNamePro(isRefresh: false);
+        businessProvider.getBusinessClientNamePro('', isRefresh: false);
       }
     } else {
       print('no listening ');
@@ -97,7 +99,14 @@ class _AddBusinessState extends State<AddBusiness> {
               failureMessage:
                   businessProvider.failure?.message ?? "No internet connection",
 
-              onRetry: () async {},
+              onRetry: () async {
+                await businessProvider.addBusinessPro(
+                  businessProvider.selectedBusinessClientId.toString(),
+                  businessProvider.selecttedbusinessId.toString(),
+                  totalBusinessCostController.text.toString(),
+                  businessTypeTextController.text.toString(),
+                );
+              },
             );
           }
           return Stack(
@@ -136,211 +145,230 @@ class _AddBusinessState extends State<AddBusiness> {
                           // form section
                           Expanded(
                             child: Container(
-                              child: SingleChildScrollView(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const SizedBox(height: 20),
-                                    CustomSelectWidget(
-                                      isTablet: isTablet,
-                                      text:
-                                          businessProvider
-                                              .selectedBusinessClientName ??
-                                          "Select Client",
-                                      maintext: "Select Client",
-                                      onTap: () {
-                                        businessProvider.hideShowClientList();
-                                      },
-                                      hideShowIcon:
-                                          businessProvider
-                                              .hideAndShowClientList!,
-                                      businessProvider: businessProvider,
-                                      isSelected:
-                                          businessProvider
-                                              .selectedBusinessClientName !=
-                                          null,
-                                    ),
-                                    const SizedBox(height: 3),
-                                    // list of clients
-                                    businessProvider.hideAndShowClientList ==
-                                            false
-                                        ? SizedBox()
-                                        : ClientListWidget(
-                                          searchController: searchController,
-                                          scrollcontrollers: scrollcontrollers,
-                                          isTablet: isTablet,
-                                          businessProvider: businessProvider,
-                                        ),
+                              child: RefreshIndicator(
+                                onRefresh: () async {
+                                  _initialData();
+                                },
+                                child: SingleChildScrollView(
+                                  physics: AlwaysScrollableScrollPhysics(),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const SizedBox(height: 20),
+                                      CustomSelectWidget(
+                                        isTablet: isTablet,
+                                        text:
+                                            businessProvider
+                                                .selectedBusinessClientName ??
+                                            "Select Client",
+                                        maintext: "Select Client",
+                                        onTap: () {
+                                          businessProvider.hideShowClientList();
+                                        },
+                                        hideShowIcon:
+                                            businessProvider
+                                                .hideAndShowClientList!,
+                                        businessProvider: businessProvider,
+                                        isSelected:
+                                            businessProvider
+                                                .selectedBusinessClientName !=
+                                            null,
+                                      ),
+                                      const SizedBox(height: 3),
+                                      // list of clients
+                                      businessProvider.hideAndShowClientList ==
+                                              false
+                                          ? SizedBox()
+                                          : ClientListWidget(
+                                            searchController: searchController,
+                                            scrollcontrollers:
+                                                scrollcontrollers,
+                                            isTablet: isTablet,
+                                            businessProvider: businessProvider,
+                                          ),
 
-                                    const SizedBox(height: 10),
-                                    CustomSelectWidget(
-                                      isTablet: isTablet,
-                                      text:
+                                      const SizedBox(height: 10),
+                                      CustomSelectWidget(
+                                        isTablet: isTablet,
+                                        text:
+                                            businessProvider
+                                                .selectedBusinessName ??
+                                            "Select Business Name",
+                                        maintext: "Select Business Name",
+                                        onTap: () {
                                           businessProvider
-                                              .selectedBusinessName ??
-                                          "Select Business Name",
-                                      maintext: "Select Business Name",
-                                      onTap: () {
-                                        businessProvider.hideShowBusinessList();
-                                      },
-                                      hideShowIcon:
-                                          businessProvider
-                                              .hideAndShowBusinessList,
-                                      businessProvider: businessProvider,
-                                      isSelected:
-                                          businessProvider
-                                              .selectedBusinessName !=
-                                          null,
-                                    ),
-                                    const SizedBox(height: 3),
-                                    // list of Business list
-                                    businessProvider.hideAndShowBusinessList ==
-                                            false
-                                        ? SizedBox()
-                                        : BusinessListWidget(
-                                          businessProvider: businessProvider,
-                                        ),
+                                              .hideShowBusinessList();
+                                        },
+                                        hideShowIcon:
+                                            businessProvider
+                                                .hideAndShowBusinessList,
+                                        businessProvider: businessProvider,
+                                        isSelected:
+                                            businessProvider
+                                                .selectedBusinessName !=
+                                            null,
+                                      ),
+                                      const SizedBox(height: 3),
+                                      // list of Business list
+                                      businessProvider
+                                                  .hideAndShowBusinessList ==
+                                              false
+                                          ? SizedBox()
+                                          : BusinessListWidget(
+                                            businessProvider: businessProvider,
+                                            searchBusinessController:
+                                                searchBusinessController,
+                                          ),
 
-                                    const SizedBox(height: 10),
-                                    CustomTextFormFieldsWidget(
-                                      isTablet: isTablet,
-                                      title: "Business Title",
-                                      hintText: "Enter Business Title",
-                                      controller: businessTypeTextController,
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return "Please enter business Title";
-                                        } else {
-                                          return null;
-                                        }
-                                      },
-                                      keyboardType:
-                                          TextInputType.text, // 👈 pass here
-                                    ),
-                                    const SizedBox(height: 10),
-                                    CustomTextFormFieldsWidget(
-                                      isTablet: isTablet,
-                                      title: "Business Cost",
-                                      hintText: "Enter Business Cost",
-                                      controller: totalBusinessCostController,
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return "Please enter business cost";
-                                        } else {
-                                          return null;
-                                        }
-                                      },
-                                      keyboardType:
-                                          TextInputType.number, // 👈 pass here
-                                    ),
-                                    const SizedBox(height: 50),
-                                    InkWell(
-                                      onTap: () async {
-                                        if (formKey.currentState!.validate()) {
-                                          /// ❌ Client Empty
-                                          if (businessProvider
-                                                      .selectedBusinessClientName ==
-                                                  null ||
-                                              businessProvider
-                                                  .selectedBusinessClientName!
-                                                  .isEmpty) {
-                                            showAppSnackBar(
-                                              context,
-                                              message:
-                                                  "Please select client name",
-                                            );
-                                            return;
+                                      const SizedBox(height: 10),
+                                      CustomTextFormFieldsWidget(
+                                        isTablet: isTablet,
+                                        title: "Business Title",
+                                        hintText: "Enter Business Title",
+                                        controller: businessTypeTextController,
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return "Please enter business Title";
+                                          } else {
+                                            return null;
                                           }
-
-                                          /// ❌ Business Name Empty
-                                          if (businessProvider
-                                                      .selectedBusinessName ==
-                                                  null ||
-                                              businessProvider
-                                                  .selectedBusinessName!
-                                                  .isEmpty) {
-                                            showAppSnackBar(
-                                              context,
-                                              message:
-                                                  "Please select business name",
-                                            );
-                                            return;
+                                        },
+                                        keyboardType:
+                                            TextInputType.text, // 👈 pass here
+                                      ),
+                                      const SizedBox(height: 10),
+                                      CustomTextFormFieldsWidget(
+                                        isTablet: isTablet,
+                                        title: "Business Cost",
+                                        hintText: "Enter Business Cost",
+                                        controller: totalBusinessCostController,
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return "Please enter business cost";
+                                          } else {
+                                            return null;
                                           }
+                                        },
+                                        keyboardType:
+                                            TextInputType
+                                                .number, // 👈 pass here
+                                      ),
+                                      const SizedBox(height: 50),
+                                      InkWell(
+                                        onTap: () async {
+                                          if (formKey.currentState!
+                                              .validate()) {
+                                            /// ❌ Client Empty
+                                            if (businessProvider
+                                                        .selectedBusinessClientName ==
+                                                    null ||
+                                                businessProvider
+                                                    .selectedBusinessClientName!
+                                                    .isEmpty) {
+                                              showAppSnackBar(
+                                                context,
+                                                message:
+                                                    "Please select client name",
+                                              );
+                                              return;
+                                            }
 
-                                          await businessProvider.addBusinessPro(
-                                            businessProvider
-                                                .selectedBusinessClientId
-                                                .toString(),
-                                            businessProvider.selecttedbusinessId
-                                                .toString(),
-                                            totalBusinessCostController.text
-                                                .toString(),
-                                            businessTypeTextController.text
-                                                .toString(),
-                                          );
+                                            /// ❌ Business Name Empty
+                                            if (businessProvider
+                                                        .selectedBusinessName ==
+                                                    null ||
+                                                businessProvider
+                                                    .selectedBusinessName!
+                                                    .isEmpty) {
+                                              showAppSnackBar(
+                                                context,
+                                                message:
+                                                    "Please select business name",
+                                              );
+                                              return;
+                                            }
 
-                                          if (businessProvider.success !=
-                                              null) {
-                                            Navigator.pop(context);
-                                            showSuccessDialog(
-                                              context,
-                                              "assets/images/successicons.png",
-                                              "Success",
-                                              "${businessProvider.success!.message}",
-                                            );
-                                            businessProvider
-                                                .clearBusinessNameAndIdes();
-                                            totalBusinessCostController.text =
-                                                '';
-                                            final DateTime now = DateTime.now();
-
-                                            /// 👉 Get current year
-                                            final String currentYear =
-                                                businessProvider.selectedYear
-                                                    .toString();
-
-                                            /// 👉 Get current month (2 digit)
-
-                                            final String currentMonth = now
-                                                .month
-                                                .toString()
-                                                .padLeft(2, '0');
-                                            print('year : ${currentYear}');
-                                            print(
-                                              'month......... : ${currentMonth}',
-                                            );
-                                            businessProvider
-                                                .getFilterSelectedIndexNamePro(
-                                                  '',
+                                            await businessProvider
+                                                .addBusinessPro(
+                                                  businessProvider
+                                                      .selectedBusinessClientId
+                                                      .toString(),
+                                                  businessProvider
+                                                      .selecttedbusinessId
+                                                      .toString(),
+                                                  totalBusinessCostController
+                                                      .text
+                                                      .toString(),
+                                                  businessTypeTextController
+                                                      .text
+                                                      .toString(),
                                                 );
-                                            businessProvider
-                                                .resetDateSelection();
-                                            businessProvider
-                                                .getAllBusinessListPro(
-                                                  currentMonth,
-                                                  currentYear,
-                                                  '',
-                                                  '',
-                                                  isRefresh: true,
-                                                );
+
+                                            if (businessProvider.success !=
+                                                null) {
+                                              Navigator.pop(context);
+                                              showSuccessDialog(
+                                                context,
+                                                "assets/images/successicons.png",
+                                                "Success",
+                                                "${businessProvider.success!.message}",
+                                              );
+                                              businessProvider
+                                                  .clearBusinessNameAndIdes();
+                                              totalBusinessCostController.text =
+                                                  '';
+                                              final DateTime now =
+                                                  DateTime.now();
+
+                                              /// 👉 Get current year
+                                              final String currentYear =
+                                                  businessProvider.selectedYear
+                                                      .toString();
+
+                                              /// 👉 Get current month (2 digit)
+
+                                              final String currentMonth = now
+                                                  .month
+                                                  .toString()
+                                                  .padLeft(2, '0');
+                                              print('year : ${currentYear}');
+                                              print(
+                                                'month......... : ${currentMonth}',
+                                              );
+                                              businessProvider
+                                                  .getFilterSelectedIndexNamePro(
+                                                    '',
+                                                  );
+                                              businessProvider
+                                                  .resetDateSelection();
+                                              businessProvider
+                                                  .getAllBusinessListPro(
+                                                    currentMonth,
+                                                    currentYear,
+                                                    '',
+                                                    '',
+                                                    isRefresh: true,
+                                                  );
+                                            }
                                           }
-                                        }
-                                      },
-                                      child: Container(
-                                        height: 50,
-                                        decoration: BoxDecoration(
-                                          color: kButtonColor2,
-                                          borderRadius: BorderRadius.circular(
-                                            15,
+                                        },
+                                        child: Container(
+                                          height: 50,
+                                          decoration: BoxDecoration(
+                                            color: kButtonColor2,
+                                            borderRadius: BorderRadius.circular(
+                                              15,
+                                            ),
+                                          ),
+                                          child: Center(
+                                            child: Text('Add Business'),
                                           ),
                                         ),
-                                        child: Center(
-                                          child: Text('Add Business'),
-                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(height: 100),
-                                  ],
+                                      const SizedBox(height: 100),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
@@ -407,128 +435,144 @@ void showAppSnackBar(
 
 class BusinessListWidget extends StatelessWidget {
   final BusinessProvider businessProvider;
+  final TextEditingController searchBusinessController;
 
-  const BusinessListWidget({super.key, required this.businessProvider});
+  BusinessListWidget({
+    super.key,
+    required this.businessProvider,
+    required this.searchBusinessController,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 450,
       padding: const EdgeInsets.all(12),
+
+      /// 🔹 List Background Decoration (as you asked)
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Color(0xFFF8FAFF), Color(0xFFEAF1FF)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(.08),
-            blurRadius: 10,
-            offset: Offset(0, 4),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(18),
+        color: Colors.white.withOpacity(0.03),
+        border: Border.all(color: Colors.white12),
       ),
 
-      child:
-          (businessProvider.businessNamesList == null ||
-                  businessProvider.businessNamesList!.isEmpty)
-              ? Center(
-                child: Container(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Lottie.asset('assets/json/noevents.json', width: 150),
-                        const SizedBox(height: 10),
-                        const Text(
-                          'No Client Found',
-                          style: TextStyle(color: Colors.white, fontSize: 16),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              )
-              : ListView.separated(
-                padding: EdgeInsets.all(0),
-                itemCount: businessProvider.businessNamesList!.length,
-                separatorBuilder: (_, __) => SizedBox(height: 12),
-                itemBuilder: (context, index) {
-                  return InkWell(
-                    onTap: () {
-                      businessProvider.setBusinessNameAndId(
-                        businessProvider.businessNamesList![index].name
-                            .toString(),
-                        businessProvider.businessNamesList![index].id
-                            .toString(),
-                      );
-                      businessProvider.hideShowBusinessList();
-                    },
-                    child: Container(
-                      padding: EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(15),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(.05),
-                            blurRadius: 8,
-                            offset: Offset(0, 3),
-                          ),
-                        ],
-                      ),
+      child: Column(
+        children: [
+          /// 🔍 SEARCH BAR
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            margin: const EdgeInsets.only(bottom: 12),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(14),
+              color: Colors.white.withOpacity(0.05),
+              border: Border.all(color: Colors.white12),
+            ),
+            child: TextField(
+              controller: searchBusinessController,
+              onChanged: (value) async {
+                await businessProvider.getBusinessNamePro(value.toString());
+              },
+              style: const TextStyle(color: Colors.white),
+              decoration: const InputDecoration(
+                icon: Icon(Icons.search, color: Colors.white54),
+                hintText: "Search Business...",
+                hintStyle: TextStyle(color: Colors.white38),
+                border: InputBorder.none,
+              ),
+            ),
+          ),
 
-                      child: Row(
-                        children: [
-                          /// 🔹 Business Logo / Avatar
-                          CircleAvatar(
-                            radius: 25,
-                            backgroundColor: Color(0xFF82AE09).withOpacity(.15),
-                            child: Icon(
-                              Icons.business,
-                              color: Color(0xFF82AE09),
-                              size: 28,
+          /// 📋 LIST AREA
+          Expanded(
+            child:
+                (businessProvider.businessNamesList == null ||
+                        businessProvider.businessNamesList!.isEmpty)
+                    ? Center(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Lottie.asset(
+                              'assets/json/noevents.json',
+                              width: 150,
                             ),
-                          ),
+                            const SizedBox(height: 10),
+                            const Text(
+                              'No Business Name Found',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                    : ListView.separated(
+                      padding: EdgeInsets.zero,
+                      itemCount: businessProvider.businessNamesList!.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 12),
+                      itemBuilder: (context, index) {
+                        final data = businessProvider.businessNamesList![index];
 
-                          SizedBox(width: 14),
-
-                          /// 🔹 Business Details
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                        return InkWell(
+                          onTap: () {
+                            businessProvider.setBusinessNameAndId(
+                              data.name.toString(),
+                              data.id.toString(),
+                            );
+                            businessProvider.hideShowBusinessList();
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(14),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(15),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(.05),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: Row(
                               children: [
-                                /// Business Name
-                                Text(
-                                  "${businessProvider.businessNamesList![index].name.toString() ?? ''}",
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.black87,
+                                /// Avatar
+                                CircleAvatar(
+                                  radius: 25,
+                                  backgroundColor: const Color(
+                                    0xFF82AE09,
+                                  ).withOpacity(.15),
+                                  child: const Icon(
+                                    Icons.business,
+                                    color: Color(0xFF82AE09),
+                                    size: 28,
                                   ),
                                 ),
 
-                                SizedBox(height: 4),
+                                const SizedBox(width: 14),
 
-                                // /// Subtitle
-                                // Text(
-                                //   "Sales & Services",
-                                //   style: TextStyle(
-                                //     fontSize: 12,
-                                //     color: Colors.grey.shade600,
-                                //   ),
-                                // ),
+                                /// Name
+                                Expanded(
+                                  child: Text(
+                                    data.name ?? '',
+                                    style: const TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                ),
                               ],
                             ),
                           ),
-                        ],
-                      ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -635,7 +679,13 @@ class ClientListWidget extends StatelessWidget {
           ),
           child: TextField(
             controller: searchController,
-            // onChanged: searchClients,
+            onChanged: (value) async {
+              print('${value}');
+              await businessProvider.getBusinessClientNamePro(
+                value.toString(),
+                isRefresh: true,
+              );
+            },
             style: const TextStyle(color: Colors.white),
             decoration: InputDecoration(
               icon: const Icon(Icons.search, color: Colors.white54),
@@ -753,14 +803,14 @@ class ClientListWidget extends StatelessWidget {
                                         fontFamily: "MontrealSerial",
                                       ),
                                     ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      "Active Client",
-                                      style: TextStyle(
-                                        fontSize: isTablet ? 16 : 12,
-                                        color: Colors.white54,
-                                      ),
-                                    ),
+                                    // const SizedBox(height: 4),
+                                    // Text(
+                                    //   "Active Client",
+                                    //   style: TextStyle(
+                                    //     fontSize: isTablet ? 16 : 12,
+                                    //     color: Colors.white54,
+                                    //   ),
+                                    // ),
                                   ],
                                 ),
                               ),

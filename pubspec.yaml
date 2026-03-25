@@ -67,6 +67,7 @@ dependencies:
   flutter_image_compress: ^2.4.0
   path: ^1.9.1
   path_provider: ^2.1.5
+  device_preview: ^1.2.0
 
   
 

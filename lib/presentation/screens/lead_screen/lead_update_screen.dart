@@ -46,6 +46,9 @@ class _LeadUpdateScreenState extends State<LeadUpdateScreen> {
     print('aaaaaaaaaaaaaaaaaa : ${widget.leadData!.leadSourceId}');
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       final provider = Provider.of<LeadProvider>(context, listen: false);
+      print(
+        '${widget.leadData!.leadSourceId.toString()}......................',
+      );
       provider.leadSourceSelectedValuePro(
         widget.leadData!.leadSourceId.toString(),
       );
@@ -53,6 +56,9 @@ class _LeadUpdateScreenState extends State<LeadUpdateScreen> {
       provider.leadSelectIndex(
         widget.leadData?.leadStatus ?? '',
         widget.leadData?.leadStatusId.toString() ?? '',
+      );
+      print(
+        '${widget.leadData!.leadStatusId.toString()}......................',
       );
       provider.selectedCustomerProfileIndex(
         widget.leadData?.customerProfile ?? '',
@@ -230,33 +236,22 @@ class _LeadUpdateScreenState extends State<LeadUpdateScreen> {
                                       title: "Email",
                                       hintText: "Enter Valid Email",
                                       controller: emailController,
-
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Please enter email address';
-                                        } else if (!RegExp(
-                                          r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
-                                        ).hasMatch(value)) {
-                                          return 'Please enter a valid email address';
-                                        }
-                                        return null;
-                                      },
                                     ),
-                                    const SizedBox(height: 20),
-                                    CustomTextFormFieldsWidget(
-                                      isTablet: isTablet,
-                                      title: "Address",
-                                      hintText: "Enter address",
-                                      maxLines: 3,
-                                      controller: addressController,
+                                    // const SizedBox(height: 20),
+                                    // CustomTextFormFieldsWidget(
+                                    //   isTablet: isTablet,
+                                    //   title: "Address",
+                                    //   hintText: "Enter address",
+                                    //   maxLines: 3,
+                                    //   controller: addressController,
 
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Please enter addrsss';
-                                        }
-                                        return null;
-                                      },
-                                    ),
+                                    //   validator: (value) {
+                                    //     if (value == null || value.isEmpty) {
+                                    //       return 'Please enter addrsss';
+                                    //     }
+                                    //     return null;
+                                    //   },
+                                    // ),
                                     const SizedBox(height: 20),
                                     DropdownButtonFormField<String>(
                                       onTap: () async {
@@ -463,38 +458,38 @@ class _LeadUpdateScreenState extends State<LeadUpdateScreen> {
                                                         Axis.horizontal,
                                                     itemCount:
                                                         leadProvider
-                                                            .getLeadStatusList!
-                                                            .length,
+                                                            .getLeadStatusList
+                                                            ?.skip(1)
+                                                            .length ??
+                                                        0,
                                                     itemBuilder: (
                                                       context,
                                                       index,
                                                     ) {
+                                                      final item =
+                                                          leadProvider
+                                                              .getLeadStatusList!
+                                                              .skip(1)
+                                                              .toList()[index];
                                                       return InkWell(
                                                         onTap: () {
                                                           print(
-                                                            '${leadProvider.getLeadStatusList![index].status}',
+                                                            '${item.status}',
                                                           );
-                                                          print(
-                                                            '${leadProvider.getLeadStatusList![index].id}',
-                                                          );
-                                                          leadProvider.leadSelectIndex(
-                                                            leadProvider
-                                                                .getLeadStatusList![index]
-                                                                .status
-                                                                .toString(),
-                                                            leadProvider
-                                                                .getLeadStatusList![index]
-                                                                .id
-                                                                .toString(),
-                                                          );
+                                                          print('${item.id}');
+                                                          leadProvider
+                                                              .leadSelectIndex(
+                                                                item.status
+                                                                    .toString(),
+                                                                item.id
+                                                                    .toString(),
+                                                              );
                                                         },
                                                         child: Container(
                                                           decoration: BoxDecoration(
                                                             color:
                                                                 leadProvider.leadSelectedIndexName ==
-                                                                        leadProvider
-                                                                            .getLeadStatusList![index]
-                                                                            .status
+                                                                        item.status
                                                                     ? Color.fromARGB(
                                                                       101,
                                                                       152,
@@ -524,7 +519,7 @@ class _LeadUpdateScreenState extends State<LeadUpdateScreen> {
                                                                   8.0,
                                                                 ),
                                                             child: Text(
-                                                              '${leadProvider.getLeadStatusList![index].status}',
+                                                              '${item.status ?? ''}',
                                                               style: TextStyle(
                                                                 fontFamily:
                                                                     "MontrealSerial",
@@ -849,7 +844,7 @@ class CustomTextFormFieldsWidget extends StatefulWidget {
     required this.hintText,
     this.maxLines,
     this.controller,
-    required this.validator,
+    this.validator,
   });
 
   final bool isTablet;

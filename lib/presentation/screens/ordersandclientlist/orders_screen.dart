@@ -201,30 +201,40 @@ class _OrdersScreenState extends State<OrdersScreen> {
                             : (orderProvider.searchedclientList == null ||
                                 orderProvider.searchedclientList!.isEmpty)
                             ? Expanded(
-                              child: Container(
-                                width: double.infinity,
-                                height: 500,
-                                decoration: BoxDecoration(
-                                  color: Colors.transparent,
-                                ),
+                              child: RefreshIndicator(
+                                onRefresh: () async {
+                                  _initialData();
+                                },
                                 child: SingleChildScrollView(
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Lottie.asset(
-                                        'assets/json/noevents.json',
-                                        width: scale(150),
+                                  physics:
+                                      const AlwaysScrollableScrollPhysics(),
+                                  child: SizedBox(
+                                    height:
+                                        MediaQuery.of(context).size.height *
+                                        0.6,
+                                    // or use double.infinity with LayoutBuilder
+                                    child: Center(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Lottie.asset(
+                                            'assets/json/noevents.json',
+                                            width: 150,
+                                          ),
+                                          const SizedBox(height: 10),
+                                          const Text(
+                                            'No Client Found',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      const SizedBox(height: 10),
-                                      Text(
-                                        'No Client Found',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: scale(16),
-                                        ),
-                                      ),
-                                    ],
+                                    ),
                                   ),
                                 ),
                               ),
@@ -238,6 +248,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                   child: ListView.separated(
                                     controller: scrollcontrollers,
                                     shrinkWrap: false,
+                                    physics: AlwaysScrollableScrollPhysics(),
                                     itemCount:
                                         orderProvider
                                             .searchedclientList!

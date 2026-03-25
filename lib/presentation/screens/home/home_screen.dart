@@ -37,7 +37,6 @@ class _HomeScreenState extends State<HomeScreen> {
         context,
         listen: false,
       );
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final provider = Provider.of<HomeProvider>(context, listen: false);
       final leadprovider = Provider.of<LeadProvider>(context, listen: false);
       final profileProviders = Provider.of<ProfileProvider>(
@@ -48,30 +47,24 @@ class _HomeScreenState extends State<HomeScreen> {
       //  Clear old profile images
       profileProviders.clearSelectedImages();
       //Load Home Data
-      provider.getHomePro();
+      // provider.getHomePro();
       // // Then load lead data
-      leadprovider.getLeadPro('', '', isRefresh: true);
+      // leadprovider.getLeadPro('', '', isRefresh: true);
       // //Load Profile Data
-      profileProviders.getProfileData(); // wait for data to load
+      // profileProviders.getProfileData(); // wait for data to load
       // // Load Profile Image from Shared
-      profileProviders.getProfilImgFromShared(); // wait for data to load
-      appUpdateProvider.fetchUpdateResponce();
-      appUpdateProvider.checkForUpdate(context);
-      // try {
-      //   /// 2️⃣ Run APIs in parallel (faster, no UI block)
-      //   await Future.wait([
-      //     provider.getHomePro(),
-      //     leadprovider.getLeadPro('', isRefresh: true),
-      //     profileProviders.getProfileData(),
-      //     profileProviders.getProfilImgFromShared(),
-      //     appUpdateProvider.fetchUpdateResponce(),
-      //   ]);
+      // profileProviders.getProfilImgFromShared(); // wait for data to load
+      // appUpdateProvider.fetchUpdateResponce();
 
-      //   /// 3️⃣ Check update AFTER data loaded
-      //   appUpdateProvider.checkForUpdate(context);
-      // } catch (e) {
-      //   debugPrint("Initial Load Error: $e");
-      // }
+      await Future.wait([
+        provider.getHomePro(),
+        leadprovider.getLeadPro('', '', isRefresh: true),
+        profileProviders.getProfileData(),
+        profileProviders.getProfilImgFromShared(),
+        appUpdateProvider.fetchUpdateResponce(),
+      ]);
+
+      appUpdateProvider.checkForUpdate(context);
     });
   }
 
@@ -166,292 +159,367 @@ class _HomeScreenState extends State<HomeScreen> {
             ReusableScafoldAndGlowbackground(
               child: LayoutBuilder(
                 builder: (context, constraints) {
-                  final bool _isTablet = constraints.maxWidth > 600;
+                  /// 📱 Breakpoints
+                  final isMobile = constraints.maxWidth < 600;
+                  final _isTablet =
+                      constraints.maxWidth >= 600 &&
+                      constraints.maxWidth < 1100;
+                  final isLargeTablet = constraints.maxWidth >= 1100;
+
+                  /// 📏 Dynamic Sizes
+                  final horizontalPadding =
+                      isMobile
+                          ? 20.0
+                          : _isTablet
+                          ? 40.0
+                          : 80.0;
+
+                  final titleFont =
+                      isMobile
+                          ? 32.0
+                          : _isTablet
+                          ? 36.0
+                          : 42.0;
+
+                  final cardHeight =
+                      isMobile
+                          ? 90.0
+                          : _isTablet
+                          ? 110.0
+                          : 130.0;
+
+                  final mapHeight =
+                      isMobile
+                          ? 500.0
+                          : _isTablet
+                          ? 800.0
+                          : 500.0;
+
+                  final clockSize =
+                      isMobile
+                          ? 130.0
+                          : _isTablet
+                          ? 160.0
+                          : 150.0;
                   return Padding(
                     padding: EdgeInsets.symmetric(
                       vertical: _isTablet ? 50 : 25,
                       horizontal: _isTablet ? 50 : 25,
                     ),
-                    child: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(height: 30),
-                          CustomAppBarWidget(title: "WISLEAD"),
-                          SizedBox(height: 40),
-                          RichText(
-                            text: TextSpan(
-                              children: [
-                                TextSpan(
-                                  text: "Ready",
-                                  style: TextStyle(
-                                    fontFamily: "MontrealSerial",
-                                    color: Color(0xFF82AE09),
-                                    fontSize: 40,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                WidgetSpan(child: SizedBox(width: 10)),
-                                TextSpan(
-                                  text: "For Todays",
-                                  style: TextStyle(
-                                    fontFamily: "MontrealSerial",
-                                    color: Colors.white,
-                                    fontSize: 40,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Text(
-                            'Challenge',
-                            style: TextStyle(
-                              fontFamily: "MontrealSerial",
-                              color: Colors.white,
-                              fontSize: 40,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          SizedBox(height: 30),
-
-                          // if (homeProvider.isTracking)
-                          //   Container(
-                          //     padding: EdgeInsets.all(8),
-                          //     decoration: BoxDecoration(
-                          //       color: Colors.green.withOpacity(0.3),
-                          //       borderRadius: BorderRadius.circular(8),
-                          //     ),
-                          //     child: Row(
-                          //       mainAxisSize: MainAxisSize.min,
-                          //       children: [
-                          //         Icon(
-                          //           Icons.location_on,
-                          //           color: Colors.green,
-                          //           size: 16,
-                          //         ),
-                          //         SizedBox(width: 4),
-                          //         Text(
-                          //           'Live Tracking Active',
-                          //           style: TextStyle(
-                          //             color: Colors.green,
-                          //             fontSize: 12,
-                          //             fontWeight: FontWeight.bold,
-                          //           ),
-                          //         ),
-                          //       ],
-                          //     ),
-                          //   ),
-                          // Additional status container
-                          (homeProvider.isLoading ||
-                                  profileProvider.isLoading ||
-                                  homeProvider.homeData == null)
-                              ? HomeShimmer()
-                              : Column(
+                    child: RefreshIndicator(
+                      onRefresh: () {
+                        return Future.wait([
+                          homeProvider.getHomePro(),
+                          leadProvider.getLeadPro('', '', isRefresh: true),
+                          profileProvider.getProfileData(),
+                        ]);
+                      },
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(height: 30),
+                            CustomAppBarWidget(title: "Wteams"),
+                            SizedBox(height: 40),
+                            RichText(
+                              text: TextSpan(
                                 children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Expanded(
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            color: khome3rdSectionColor,
-                                            borderRadius: BorderRadius.circular(
-                                              20,
-                                            ),
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(18),
-                                            child: Column(
-                                              children: [
-                                                Text(
-                                                  'Today Distance',
-                                                  style: TextStyle(
-                                                    fontFamily:
-                                                        "MontrealSerial",
-                                                    color: Colors.white,
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
-                                                ),
-                                                SizedBox(height: 8),
-                                                Text(
-                                                  '${homeProvider.homeData?.km == null ? (homeProvider.totalDistancePrefData / 1000).toStringAsFixed(2) : homeProvider.homeData?.km} KM',
-                                                  style: TextStyle(
-                                                    fontFamily:
-                                                        "MontrealSerial",
-                                                    color: Colors.white,
-                                                    fontSize: 24,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(width: 12),
-                                      Expanded(
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            color: khome3rdSectionColor,
-                                            borderRadius: BorderRadius.circular(
-                                              20,
-                                            ),
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(18),
-                                            child: Column(
-                                              children: [
-                                                Text(
-                                                  'Pending Leads',
-                                                  style: TextStyle(
-                                                    fontFamily:
-                                                        "MontrealSerial",
-                                                    color: Colors.white,
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
-                                                ),
-                                                SizedBox(height: 8),
-                                                Text(
-                                                  '${leadProvider.pendingLeads ?? '0'}',
-                                                  style: TextStyle(
-                                                    fontFamily:
-                                                        "MontrealSerial",
-                                                    color: Colors.white,
-                                                    fontSize: 24,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
+                                  TextSpan(
+                                    text: "Ready",
+                                    style: TextStyle(
+                                      fontFamily: "MontrealSerial",
+                                      color: Color(0xFF82AE09),
+                                      fontSize: titleFont,
+                                      fontWeight: FontWeight.w500,
+                                    ),
                                   ),
-                                  SizedBox(height: 20),
-
-                                  Stack(
-                                    children: [
-                                      ClipRRect(
-                                        borderRadius: const BorderRadius.only(
-                                          topLeft: Radius.circular(30),
-                                          topRight: Radius.circular(30),
-                                        ),
-                                        child: SizedBox(
-                                          width: double.infinity,
-                                          height: 400,
-                                          child: GoogleMap(
-                                            onMapCreated:
-                                                homeProvider.setMapController,
-                                            initialCameraPosition: CameraPosition(
-                                              target:
-                                                  homeProvider
-                                                      .currentPositionPrefData ??
-                                                  homeProvider
-                                                      .currentPosition ??
-                                                  LatLng(37.43296, -122.08832),
-                                              zoom: 19,
-                                            ),
-                                            myLocationEnabled: true,
-                                            myLocationButtonEnabled: true,
-                                            markers: homeProvider.markers,
-                                          ),
-                                        ),
-                                      ),
-                                      Positioned(
-                                        bottom: 40,
-                                        left: 100,
-                                        right: 100,
-                                        child: GestureDetector(
-                                          onTap:
-                                              homeProvider.isLoadingAuth
-                                                  ? null
-                                                  : () async {
-                                                    homeProvider
-                                                        .authenticateAndClock(
-                                                          context,
-                                                        );
-                                                  },
-                                          child: Container(
-                                            width: 130,
-                                            height: 130,
-                                            decoration: const BoxDecoration(
-                                              color: Colors.transparent,
-                                            ),
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(
-                                                8.0,
-                                              ),
-                                              child: Container(
-                                                decoration: BoxDecoration(
-                                                  color:
-                                                      homeProvider
-                                                                  .homeData
-                                                                  ?.status ==
-                                                              true
-                                                          ? Colors.green
-                                                              .withOpacity(0.30)
-                                                          : Colors.red
-                                                              .withOpacity(
-                                                                0.30,
-                                                              ),
-                                                  shape: BoxShape.circle,
-                                                ),
-                                                child: Center(
-                                                  child:
-                                                      homeProvider.isLoadingAuth
-                                                          ? const CircularProgressIndicator(
-                                                            color: Colors.white,
-                                                          )
-                                                          : Column(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .center,
-                                                            children: [
-                                                              Image.asset(
-                                                                'assets/images/fingerprient.png',
-                                                                width: 40,
-                                                                height: 40,
-                                                              ),
-                                                              const SizedBox(
-                                                                height: 4,
-                                                              ),
-                                                              Text(
-                                                                homeProvider
-                                                                            .homeData
-                                                                            ?.status ==
-                                                                        true
-                                                                    ? "Clock Out"
-                                                                    : "Clock In",
-                                                                style: const TextStyle(
-                                                                  color:
-                                                                      Colors
-                                                                          .white,
-                                                                  fontSize: 12,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
+                                  WidgetSpan(child: SizedBox(width: 10)),
+                                  TextSpan(
+                                    text: "For Todays",
+                                    style: TextStyle(
+                                      fontFamily: "MontrealSerial",
+                                      color: Colors.white,
+                                      fontSize: titleFont,
+                                      fontWeight: FontWeight.w500,
+                                    ),
                                   ),
                                 ],
                               ),
+                            ),
+                            Text(
+                              'Challenge',
+                              style: TextStyle(
+                                fontFamily: "MontrealSerial",
+                                color: Colors.white,
+                                fontSize: titleFont,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            SizedBox(height: 30),
 
-                          const SizedBox(height: 100),
-                        ],
+                            // if (homeProvider.isTracking)
+                            //   Container(
+                            //     padding: EdgeInsets.all(8),
+                            //     decoration: BoxDecoration(
+                            //       color: Colors.green.withOpacity(0.3),
+                            //       borderRadius: BorderRadius.circular(8),
+                            //     ),
+                            //     child: Row(
+                            //       mainAxisSize: MainAxisSize.min,
+                            //       children: [
+                            //         Icon(
+                            //           Icons.location_on,
+                            //           color: Colors.green,
+                            //           size: 16,
+                            //         ),
+                            //         SizedBox(width: 4),
+                            //         Text(
+                            //           'Live Tracking Active',
+                            //           style: TextStyle(
+                            //             color: Colors.green,
+                            //             fontSize: 12,
+                            //             fontWeight: FontWeight.bold,
+                            //           ),
+                            //         ),
+                            //       ],
+                            //     ),
+                            //   ),
+                            // Additional status container
+                            (homeProvider.isLoading ||
+                                    profileProvider.isLoading ||
+                                    homeProvider.homeData == null)
+                                ? HomeShimmer()
+                                : Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Expanded(
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              color: khome3rdSectionColor,
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                            ),
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(18),
+                                              child: Column(
+                                                children: [
+                                                  Text(
+                                                    'Today Distance',
+                                                    style: TextStyle(
+                                                      fontFamily:
+                                                          "MontrealSerial",
+                                                      color: Colors.white,
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                  SizedBox(height: 8),
+
+                                                  Text(
+                                                    homeProvider.homeData !=
+                                                            null
+                                                        ? (double.tryParse(
+                                                                  homeProvider
+                                                                          .homeData!
+                                                                          .km
+                                                                          ?.toString() ??
+                                                                      '',
+                                                                ) ??
+                                                                ((homeProvider
+                                                                            .totalDistancePrefData ??
+                                                                        0) /
+                                                                    1000))
+                                                            .toStringAsFixed(2)
+                                                        : '0.00',
+                                                    style: const TextStyle(
+                                                      fontFamily:
+                                                          "MontrealSerial",
+                                                      color: Colors.white,
+                                                      fontSize: 24,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(width: 12),
+                                        Expanded(
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              color: khome3rdSectionColor,
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                            ),
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(18),
+                                              child: Column(
+                                                children: [
+                                                  Text(
+                                                    'Pending Leads',
+                                                    style: TextStyle(
+                                                      fontFamily:
+                                                          "MontrealSerial",
+                                                      color: Colors.white,
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                  SizedBox(height: 8),
+                                                  Text(
+                                                    '${leadProvider.pendingLeads ?? '0'}',
+                                                    style: TextStyle(
+                                                      fontFamily:
+                                                          "MontrealSerial",
+                                                      color: Colors.white,
+                                                      fontSize: 24,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 20),
+
+                                    Stack(
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius: const BorderRadius.only(
+                                            topLeft: Radius.circular(30),
+                                            topRight: Radius.circular(30),
+                                          ),
+                                          child: SizedBox(
+                                            width: double.infinity,
+                                            height: mapHeight,
+                                            child: GoogleMap(
+                                              onMapCreated:
+                                                  homeProvider.setMapController,
+                                              initialCameraPosition: CameraPosition(
+                                                target:
+                                                    (homeProvider
+                                                            .currentPositionPrefData ??
+                                                        homeProvider
+                                                            .currentPosition ??
+                                                        const LatLng(
+                                                          37.43296,
+                                                          -122.08832,
+                                                        )), // Provide a default
+                                                zoom: 19,
+                                              ),
+                                              myLocationEnabled: true,
+                                              myLocationButtonEnabled: true,
+                                              markers: homeProvider.markers,
+                                            ),
+                                          ),
+                                        ),
+                                        Positioned(
+                                          bottom: isMobile ? 30 : 40,
+                                          left: 100,
+                                          right: 100,
+                                          child: GestureDetector(
+                                            onTap:
+                                                homeProvider.isLoadingAuth
+                                                    ? null
+                                                    : () async {
+                                                      homeProvider
+                                                          .authenticateAndClock(
+                                                            context,
+                                                          );
+                                                    },
+                                            child: Container(
+                                              width: clockSize,
+                                              height: clockSize,
+                                              decoration: const BoxDecoration(
+                                                color: Colors.transparent,
+                                              ),
+                                              child: Padding(
+                                                padding: const EdgeInsets.all(
+                                                  8.0,
+                                                ),
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                    color:
+                                                        homeProvider
+                                                                    .homeData
+                                                                    ?.status ==
+                                                                true
+                                                            ? Colors.green
+                                                                .withOpacity(
+                                                                  0.30,
+                                                                )
+                                                            : Colors.red
+                                                                .withOpacity(
+                                                                  0.30,
+                                                                ),
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  child: Center(
+                                                    child:
+                                                        homeProvider
+                                                                .isLoadingAuth
+                                                            ? const CircularProgressIndicator(
+                                                              color:
+                                                                  Colors.white,
+                                                            )
+                                                            : Column(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .center,
+                                                              children: [
+                                                                Image.asset(
+                                                                  'assets/images/fingerprient.png',
+                                                                  width: 40,
+                                                                  height: 40,
+                                                                ),
+                                                                const SizedBox(
+                                                                  height: 4,
+                                                                ),
+                                                                Text(
+                                                                  homeProvider
+                                                                              .homeData
+                                                                              ?.status ==
+                                                                          true
+                                                                      ? "Clock Out"
+                                                                      : "Clock In",
+                                                                  style: const TextStyle(
+                                                                    color:
+                                                                        Colors
+                                                                            .white,
+                                                                    fontSize:
+                                                                        12,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+
+                            const SizedBox(height: 100),
+                          ],
+                        ),
                       ),
                     ),
                   );

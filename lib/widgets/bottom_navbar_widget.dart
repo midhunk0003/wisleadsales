@@ -44,48 +44,55 @@ class _BottomNavbarWidgetState extends State<BottomNavbarWidget> {
           Positioned(
             left: 0,
             right: 0,
-            bottom: 35, // distance from bottom
-            child: ClipRRect(
-              // borderRadius: BorderRadius.circular(20),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
-                child: Container(
-                  width: double.infinity,
-                  height: 90,
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(10),
-                      topRight: Radius.circular(10),
+            bottom: 0, // stick to bottom
+            child: SafeArea(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+                  child: Container(
+                    width: double.infinity,
+                    height: 90,
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(10),
+                        topRight: Radius.circular(10),
+                      ),
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          const Color.fromARGB(82, 19, 18, 18).withOpacity(0.5),
+                          const Color.fromARGB(
+                            117,
+                            43,
+                            40,
+                            40,
+                          ).withOpacity(0.24),
+                        ],
+                      ),
                     ),
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        const Color.fromARGB(82, 19, 18, 18).withOpacity(0.5),
-                        const Color.fromARGB(117, 43, 40, 40).withOpacity(0.24),
-                      ],
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: List.generate(4, (index) {
+                        final icons = [
+                          "assets/images/navbaricon/iconhomegreen.png",
+                          "assets/images/navbaricon/iconreport.png",
+                          "assets/images/navbaricon/iconorder.png",
+                          "assets/images/navbaricon/iconsettings.png",
+                        ];
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _currentIndex = index;
+                            });
+                          },
+                          child: _navIcon(icons[index], index),
+                        );
+                      }),
                     ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: List.generate(4, (index) {
-                      final icons = [
-                        "assets/images/navbaricon/iconhomegreen.png",
-                        "assets/images/navbaricon/iconreport.png",
-                        "assets/images/navbaricon/iconorder.png",
-                        "assets/images/navbaricon/iconsettings.png",
-                      ];
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _currentIndex = index;
-                          });
-                        },
-                        child: _navIcon(icons[index], index),
-                      );
-                    }),
                   ),
                 ),
               ),

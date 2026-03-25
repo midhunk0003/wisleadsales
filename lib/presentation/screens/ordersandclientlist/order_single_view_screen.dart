@@ -27,6 +27,8 @@ class _OrderSingleViewScreenState extends State<OrderSingleViewScreen> {
   final TextEditingController noteController = TextEditingController();
 
   final TextEditingController callLOgNoteController = TextEditingController();
+  final TextEditingController callLogLanguageController =
+      TextEditingController();
 
   @override
   void initState() {
@@ -1020,32 +1022,32 @@ class _OrderSingleViewScreenState extends State<OrderSingleViewScreen> {
                           const SizedBox(height: 10),
                           Divider(),
                           const SizedBox(height: 10),
-                          /*************Address************* */
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Image.asset(
-                                'assets/images/location.png',
-                                width: 24,
-                                height: 24,
-                              ),
-                              SizedBox(width: 5),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  CustomText(fontSize: 18, text: "Address"),
-                                  const SizedBox(height: 10),
-                                  CustomText(fontSize: 12, text: ""),
-                                  CustomText(
-                                    fontSize: 18,
-                                    text:
-                                        "${'${widget.clientSingle.address ?? 'N/A'}'}",
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
 
+                          /*************Address************* */
+                          // Row(
+                          //   crossAxisAlignment: CrossAxisAlignment.start,
+                          //   children: [
+                          //     Image.asset(
+                          //       'assets/images/location.png',
+                          //       width: 24,
+                          //       height: 24,
+                          //     ),
+                          //     SizedBox(width: 5),
+                          //     Column(
+                          //       crossAxisAlignment: CrossAxisAlignment.start,
+                          //       children: [
+                          //         CustomText(fontSize: 18, text: "Address"),
+                          //         const SizedBox(height: 10),
+                          //         CustomText(fontSize: 12, text: ""),
+                          //         CustomText(
+                          //           fontSize: 18,
+                          //           text:
+                          //               "${'${widget.clientSingle.address ?? 'N/A'}'}",
+                          //         ),
+                          //       ],
+                          //     ),
+                          //   ],
+                          // ),
                           const SizedBox(height: 50),
                         ],
                       ),
@@ -1082,75 +1084,601 @@ class _OrderSingleViewScreenState extends State<OrderSingleViewScreen> {
                                         Text('Enter Call Log Details...'),
                                         SizedBox(height: 10),
                                         TextFormField(
+                                          readOnly: true,
                                           controller: callLOgNoteController,
                                           decoration: InputDecoration(
-                                            hintText: "ex : Not Attend...",
-                                            border: OutlineInputBorder(),
+                                            hintText: "ex : Interested...",
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                    20,
+                                                  ), // 👈 change radius here
+                                            ),
+
+                                            enabledBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                              borderSide: BorderSide(
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+
+                                            focusedBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                              borderSide: BorderSide(
+                                                color: Colors.blue,
+                                                width: 2,
+                                              ),
+                                            ),
+                                            suffixIcon: Icon(
+                                              orderProvider
+                                                      .hideAndShowCallFollowUpForSelect
+                                                  ? Icons.arrow_drop_up_outlined
+                                                  : Icons
+                                                      .arrow_drop_down_outlined,
+                                            ),
+                                          ),
+                                          onTap: () {
+                                            print('Interested');
+                                            orderProvider
+                                                .hideAndShowCallFollowUpForSelectPro();
+                                            orderProvider.getOrderCallNotePro();
+                                          },
+                                        ),
+                                        const SizedBox(height: 5),
+                                        AnimatedContainer(
+                                          duration: Duration(milliseconds: 300),
+                                          curve: Curves.easeInOut,
+                                          height:
+                                              orderProvider
+                                                      .hideAndShowCallFollowUpForSelect
+                                                  ? 140
+                                                  : 0,
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.circular(
+                                              20,
+                                            ),
+                                            border: Border.all(
+                                              color: Colors.grey.shade300,
+                                            ),
+                                            boxShadow:
+                                                orderProvider
+                                                        .hideAndShowCallFollowUpForSelect
+                                                    ? [
+                                                      BoxShadow(
+                                                        color: Colors.black
+                                                            .withOpacity(0.05),
+                                                        blurRadius: 8,
+                                                        offset: Offset(0, 3),
+                                                      ),
+                                                    ]
+                                                    : [],
+                                          ),
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(
+                                              20,
+                                            ),
+                                            child:
+                                                orderProvider
+                                                        .hideAndShowCallFollowUpForSelect
+                                                    ? (orderProvider
+                                                                .isLoadingCallNotes ||
+                                                            orderProvider
+                                                                    .getClientCallNotes ==
+                                                                null)
+                                                        ? Center(
+                                                          child:
+                                                              CircularProgressIndicator(),
+                                                        )
+                                                        : (orderProvider
+                                                                .isLoadingCallNotes ||
+                                                            orderProvider
+                                                                    .getClientCallNotes ==
+                                                                null)
+                                                        ? Center(
+                                                          child: Text(
+                                                            'Status Empty',
+                                                          ),
+                                                        )
+                                                        : ListView.separated(
+                                                          padding:
+                                                              EdgeInsets.zero,
+                                                          itemCount:
+                                                              orderProvider
+                                                                  .getClientCallNotes!
+                                                                  .length,
+                                                          itemBuilder: (
+                                                            context,
+                                                            index,
+                                                          ) {
+                                                            final data =
+                                                                orderProvider
+                                                                    .getClientCallNotes![index];
+                                                            final isSelected =
+                                                                orderProvider
+                                                                    .selectedCallFollowUpId ==
+                                                                data.id; // 👈 key line
+                                                            return InkWell(
+                                                              onTap: () {
+                                                                orderProvider
+                                                                    .selectCallFolowUp(
+                                                                      data.id ??
+                                                                          '',
+                                                                      data.title ??
+                                                                          '',
+                                                                    );
+                                                                callLOgNoteController
+                                                                        .text =
+                                                                    orderProvider
+                                                                        .selectedCallFollowUpName ??
+                                                                    '';
+                                                                orderProvider
+                                                                    .hideAndShowCallFollowUpForSelectPro();
+                                                                if (orderProvider
+                                                                        .selectedCallLanguageName!
+                                                                        .toLowerCase() !=
+                                                                    "language") {
+                                                                  print(
+                                                                    '0000000000000000000000000000000',
+                                                                  );
+                                                                  callLogLanguageController
+                                                                      .text = '';
+                                                                  orderProvider
+                                                                      .clearWhenLanguageNotselected();
+                                                                }
+                                                              },
+                                                              child: Padding(
+                                                                padding:
+                                                                    const EdgeInsets.symmetric(
+                                                                      horizontal:
+                                                                          16,
+                                                                      vertical:
+                                                                          12,
+                                                                    ),
+                                                                child: Row(
+                                                                  children: [
+                                                                    Icon(
+                                                                      Icons
+                                                                          .check_circle,
+                                                                      size: 18,
+                                                                      color:
+                                                                          isSelected
+                                                                              ? Colors.green
+                                                                              : Colors.grey,
+                                                                    ),
+                                                                    SizedBox(
+                                                                      width: 10,
+                                                                    ),
+                                                                    Expanded(
+                                                                      child: Text(
+                                                                        data.title ??
+                                                                            '',
+                                                                        style: TextStyle(
+                                                                          fontSize:
+                                                                              14,
+                                                                          fontWeight:
+                                                                              FontWeight.w500,
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            );
+                                                          },
+                                                          separatorBuilder:
+                                                              (
+                                                                _,
+                                                                __,
+                                                              ) => Padding(
+                                                                padding:
+                                                                    const EdgeInsets.symmetric(
+                                                                      horizontal:
+                                                                          16,
+                                                                    ),
+                                                                child: Divider(
+                                                                  color:
+                                                                      Colors
+                                                                          .grey
+                                                                          .shade200,
+                                                                  height: 1,
+                                                                ),
+                                                              ),
+                                                        )
+                                                    : null,
                                           ),
                                         ),
-                                        const SizedBox(height: 12),
-                                        ElevatedButton(
-                                          onPressed: () async {
-                                            print(
-                                              'Reason: ${orderProvider.clientIdForCallLog}',
-                                            );
-                                            if (callLOgNoteController
-                                                .text
-                                                .isNotEmpty) {
-                                              await orderProvider
-                                                  .clientAddcallLogsPro(
-                                                    orderProvider
-                                                        .clientIdForCallLog,
-                                                    '',
-                                                    callLOgNoteController.text
-                                                        .toString(),
-                                                  );
-                                              if (orderProvider.success !=
-                                                  null) {
-                                                orderProvider.callLogFlagPro();
-                                                // Update only this client's data without closing screen
-                                                setState(() {});
-                                                showSuccessDialog(
-                                                  context,
-                                                  "assets/images/successicons.png",
-                                                  "Success",
-                                                  "${orderProvider.success!.message}",
-                                                );
-                                                orderProvider.getClientsPro(
-                                                  '',
-                                                  isRefresh: true,
-                                                  '',
-                                                  '',
-                                                );
-                                              }
-                                            } else {
-                                              ScaffoldMessenger.of(
-                                                context,
-                                              ).showSnackBar(
-                                                SnackBar(
-                                                  content: const Text(
-                                                    'Please enter a call reason before submitting.',
-                                                    style: TextStyle(
-                                                      color: Colors.white,
-                                                    ),
-                                                  ),
-                                                  backgroundColor:
-                                                      Colors.redAccent,
-                                                  behavior:
-                                                      SnackBarBehavior
-                                                          .floating, // ✅ Floating snackbar
-                                                  margin: const EdgeInsets.all(
-                                                    10,
-                                                  ),
-                                                  duration: const Duration(
-                                                    seconds: 2,
-                                                  ),
+
+                                        SizedBox(height: 10),
+                                        (orderProvider.selectedCallFollowUpName ??
+                                                    '')
+                                                .toLowerCase()
+                                                .contains("language")
+                                            ? Text('Select Call Language')
+                                            : SizedBox.shrink(),
+                                        // select language
+                                        SizedBox(height: 10),
+
+                                        (orderProvider.selectedCallFollowUpName ??
+                                                    '')
+                                                .toLowerCase()
+                                                .contains("language")
+                                            ? TextFormField(
+                                              readOnly: true,
+                                              controller:
+                                                  callLogLanguageController,
+                                              decoration: InputDecoration(
+                                                hintText:
+                                                    "ex : Hindi,English...",
+                                                border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(20),
                                                 ),
-                                              );
-                                            }
-                                          },
-                                          child: Text(
-                                            '${orderProvider.isLoading ? 'Loading.....' : 'Submit'}',
+                                                enabledBorder:
+                                                    OutlineInputBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            20,
+                                                          ),
+                                                      borderSide: BorderSide(
+                                                        color: Colors.grey,
+                                                      ),
+                                                    ),
+                                                focusedBorder:
+                                                    OutlineInputBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            20,
+                                                          ),
+                                                      borderSide: BorderSide(
+                                                        color: Colors.blue,
+                                                        width: 2,
+                                                      ),
+                                                    ),
+                                                suffixIcon: Icon(
+                                                  orderProvider
+                                                          .hideAndShowCallFollowUpForSelect
+                                                      ? Icons
+                                                          .arrow_drop_up_outlined
+                                                      : Icons
+                                                          .arrow_drop_down_outlined,
+                                                ),
+                                              ),
+                                              onTap: () {
+                                                print('Language clicked');
+                                                orderProvider
+                                                    .hideAndShowCallLanguagePro();
+                                                orderProvider
+                                                    .getOrderCallLanguagePro();
+                                              },
+                                            )
+                                            : SizedBox(),
+                                        const SizedBox(height: 5),
+
+                                        (orderProvider.selectedCallFollowUpName ??
+                                                    '')
+                                                .toLowerCase()
+                                                .contains("language")
+                                            ? AnimatedContainer(
+                                              duration: Duration(
+                                                milliseconds: 300,
+                                              ),
+                                              curve: Curves.easeInOut,
+                                              height:
+                                                  orderProvider
+                                                          .hideAndShowCallLanguage
+                                                      ? 140
+                                                      : 0,
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                                border: Border.all(
+                                                  color: Colors.grey.shade300,
+                                                ),
+                                                boxShadow:
+                                                    orderProvider
+                                                            .hideAndShowCallLanguage
+                                                        ? [
+                                                          BoxShadow(
+                                                            color: Colors.black
+                                                                .withOpacity(
+                                                                  0.05,
+                                                                ),
+                                                            blurRadius: 8,
+                                                            offset: Offset(
+                                                              0,
+                                                              3,
+                                                            ),
+                                                          ),
+                                                        ]
+                                                        : [],
+                                              ),
+                                              child: ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                                child:
+                                                    orderProvider
+                                                            .hideAndShowCallLanguage
+                                                        ? (orderProvider
+                                                                    .isLoadingCallNotes ||
+                                                                orderProvider
+                                                                        .getClientCallLanguage ==
+                                                                    null)
+                                                            ? Center(
+                                                              child:
+                                                                  CircularProgressIndicator(),
+                                                            )
+                                                            : (orderProvider
+                                                                    .isLoadingCallNotes ||
+                                                                orderProvider
+                                                                        .getClientCallLanguage ==
+                                                                    null)
+                                                            ? Center(
+                                                              child: Text(
+                                                                'Status Empty',
+                                                              ),
+                                                            )
+                                                            : ListView.separated(
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .zero,
+                                                              itemCount:
+                                                                  orderProvider
+                                                                      .getClientCallLanguage!
+                                                                      .length,
+                                                              itemBuilder: (
+                                                                context,
+                                                                index,
+                                                              ) {
+                                                                final dataLang =
+                                                                    orderProvider
+                                                                        .getClientCallLanguage![index];
+                                                                final isSelected =
+                                                                    orderProvider
+                                                                        .selectedCallLanguageId ==
+                                                                    dataLang
+                                                                        .id; // 👈 key line
+                                                                return InkWell(
+                                                                  onTap: () {
+                                                                    orderProvider.selectCallLanguagePro(
+                                                                      dataLang.id ??
+                                                                          '',
+                                                                      dataLang.name ??
+                                                                          '',
+                                                                    );
+                                                                    callLogLanguageController
+                                                                            .text =
+                                                                        orderProvider
+                                                                            .selectedCallLanguageName ??
+                                                                        '';
+                                                                    orderProvider
+                                                                        .hideAndShowCallLanguagePro();
+                                                                  },
+                                                                  child: Padding(
+                                                                    padding: const EdgeInsets.symmetric(
+                                                                      horizontal:
+                                                                          16,
+                                                                      vertical:
+                                                                          12,
+                                                                    ),
+                                                                    child: Row(
+                                                                      children: [
+                                                                        Icon(
+                                                                          Icons
+                                                                              .check_circle,
+                                                                          size:
+                                                                              18,
+                                                                          color:
+                                                                              isSelected
+                                                                                  ? Colors.green
+                                                                                  : Colors.grey,
+                                                                        ),
+                                                                        SizedBox(
+                                                                          width:
+                                                                              10,
+                                                                        ),
+                                                                        Expanded(
+                                                                          child: Text(
+                                                                            dataLang.name ??
+                                                                                '',
+                                                                            style: TextStyle(
+                                                                              fontSize:
+                                                                                  14,
+                                                                              fontWeight:
+                                                                                  FontWeight.w500,
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                );
+                                                              },
+                                                              separatorBuilder:
+                                                                  (
+                                                                    _,
+                                                                    __,
+                                                                  ) => Padding(
+                                                                    padding: const EdgeInsets.symmetric(
+                                                                      horizontal:
+                                                                          16,
+                                                                    ),
+                                                                    child: Divider(
+                                                                      color:
+                                                                          Colors
+                                                                              .grey
+                                                                              .shade200,
+                                                                      height: 1,
+                                                                    ),
+                                                                  ),
+                                                            )
+                                                        : null,
+                                              ),
+                                            )
+                                            : SizedBox.shrink(),
+                                        SizedBox(height: 10),
+                                        InkWell(
+                                          borderRadius: BorderRadius.circular(
+                                            30,
+                                          ),
+                                          onTap:
+                                              orderProvider.isLoading
+                                                  ? null
+                                                  : () async {
+                                                    /// ✅ 1. Validate Status (Follow Up)
+                                                    if (orderProvider
+                                                            .selectedCallFollowUpId ==
+                                                        null) {
+                                                      ScaffoldMessenger.of(
+                                                        context,
+                                                      ).showSnackBar(
+                                                        const SnackBar(
+                                                          content: Text(
+                                                            "Please select call status",
+                                                          ),
+                                                          backgroundColor:
+                                                              Colors.redAccent,
+                                                        ),
+                                                      );
+                                                      return;
+                                                    }
+
+                                                    /// ✅ 2. Check if Language Required
+                                                    bool isLanguageRequired =
+                                                        orderProvider
+                                                            .selectedCallFollowUpName
+                                                            ?.toLowerCase()
+                                                            .contains(
+                                                              "language",
+                                                            ) ??
+                                                        false;
+
+                                                    if (isLanguageRequired &&
+                                                        callLogLanguageController
+                                                            .text
+                                                            .isEmpty) {
+                                                      ScaffoldMessenger.of(
+                                                        context,
+                                                      ).showSnackBar(
+                                                        const SnackBar(
+                                                          content: Text(
+                                                            "Please select language",
+                                                          ),
+                                                          backgroundColor:
+                                                              Colors.redAccent,
+                                                        ),
+                                                      );
+                                                      return;
+                                                    }
+
+                                                    /// ✅ 3. Optional Note Validation (your existing one)
+                                                    if (callLOgNoteController
+                                                        .text
+                                                        .isEmpty) {
+                                                      ScaffoldMessenger.of(
+                                                        context,
+                                                      ).showSnackBar(
+                                                        const SnackBar(
+                                                          content: Text(
+                                                            "Please select status",
+                                                          ),
+                                                          backgroundColor:
+                                                              Colors.redAccent,
+                                                        ),
+                                                      );
+                                                      return;
+                                                    }
+                                                    await orderProvider
+                                                        .clientAddcallLogsPro(
+                                                         orderProvider
+                                                              .clientIdForCallLog,
+                                                         '',
+                                                          orderProvider
+                                                              .selectedCallFollowUpId
+                                                              .toString(),
+                                                          orderProvider
+                                                                  .selectedCallLanguageId
+                                                                  ?.toString() ??
+                                                              '',
+                                                        );
+
+                                                    if (orderProvider.success !=
+                                                        null) {
+                                                      orderProvider
+                                                          .callLogFlagPro();
+
+                                                      showSuccessDialog(
+                                                        context,
+                                                        "assets/images/successicons.png",
+                                                        "Success",
+                                                        "${orderProvider.success!.message}",
+                                                      );
+                                                      callLOgNoteController
+                                                          .text = '';
+                                                      orderProvider
+                                                          .clearSelectdData();
+                                                      orderProvider
+                                                          .getClientsPro(
+                                                            '',
+                                                            isRefresh: true,
+                                                            '',
+                                                            '',
+                                                          );
+                                                    }
+                                                  },
+
+                                          child: Container(
+                                            height: 50,
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(30),
+                                              gradient:
+                                                  orderProvider.isLoading
+                                                      ? LinearGradient(
+                                                        colors: [
+                                                          Colors.grey.shade400,
+                                                          Colors.grey.shade300,
+                                                        ],
+                                                      )
+                                                      : LinearGradient(
+                                                        colors: [
+                                                          Color(0xFF4CAF50),
+                                                          Color(0xFF2E7D32),
+                                                        ], // 👈 green gradient
+                                                      ),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.black
+                                                      .withOpacity(0.1),
+                                                  blurRadius: 6,
+                                                  offset: Offset(0, 3),
+                                                ),
+                                              ],
+                                            ),
+                                            child:
+                                                orderProvider.isLoading
+                                                    ? SizedBox(
+                                                      height: 22,
+                                                      width: 22,
+                                                      child:
+                                                          CircularProgressIndicator(
+                                                            strokeWidth: 2,
+                                                            color: Colors.white,
+                                                          ),
+                                                    )
+                                                    : Text(
+                                                      "Submit",
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
                                           ),
                                         ),
                                       ],

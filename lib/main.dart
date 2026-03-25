@@ -1,7 +1,9 @@
 import 'package:camera/camera.dart';
+import 'package:device_preview/device_preview.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wisdeals/FirebaseMessagingService.dart';
@@ -50,6 +52,7 @@ import 'package:wisdeals/widgets/bottom_navbar_widget.dart';
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   setUpDependenceInjection();
   final SharedPreferences pref = await SharedPreferences.getInstance();
   // await pref.clear();

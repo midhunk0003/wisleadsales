@@ -146,642 +146,657 @@ class _LeadAddScreenState extends State<LeadAddScreen> {
                           // form section
                           Expanded(
                             child: Container(
-                              child: SingleChildScrollView(
-                                physics: BouncingScrollPhysics(),
-                                child: Column(
-                                  children: [
-                                    CustomTextFormFieldsWidget(
-                                      isTablet: isTablet,
-                                      title: "Client Name",
-                                      hintText: "Enter Client Name",
-                                      controller: clientNameController,
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Please enter client name';
-                                        }
-                                        return null;
-                                      },
-                                    ),
-                                    const SizedBox(height: 20),
-                                    CustomTextFormFieldsWidget(
-                                      isTablet: isTablet,
-                                      title: "Company name",
-                                      hintText: "Enter Company Name",
-                                      controller: companyNameController,
-
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Please enter company name';
-                                        }
-                                        return null;
-                                      },
-                                    ),
-                                    const SizedBox(height: 20),
-                                    CustomTextFormFieldsWidget(
-                                      isTablet: isTablet,
-                                      title: "Phone number",
-                                      hintText: "Enter Phone Number",
-                                      controller: phoneNumberController,
-
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Please enter phone number';
-                                        } else if (!RegExp(
-                                          r'^[0-9]{10}$',
-                                        ).hasMatch(value)) {
-                                          return 'Please enter a valid 10-digit phone number';
-                                        }
-                                        return null;
-                                      },
-                                    ),
-                                    const SizedBox(height: 20),
-                                    CustomTextFormFieldsWidget(
-                                      isTablet: isTablet,
-                                      title: "Email",
-                                      hintText: "Enter Valid Email",
-                                      controller: emailController,
-
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Please enter email address';
-                                        } else if (!RegExp(
-                                          r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
-                                        ).hasMatch(value)) {
-                                          return 'Please enter a valid email address';
-                                        }
-                                        return null;
-                                      },
-                                    ),
-                                    const SizedBox(height: 20),
-                                    CustomTextFormFieldsWidget(
-                                      isTablet: isTablet,
-                                      title: "Address",
-                                      hintText: "Enter Address",
-                                      maxLines: 3,
-                                      controller: addressController,
-
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Please enter addrsss';
-                                        }
-                                        return null;
-                                      },
-                                    ),
-                                    const SizedBox(height: 20),
-                                    DropdownButtonFormField<String>(
-                                      onTap: () async {
-                                        leadProvider.getLeadSourcePro();
-                                      },
-                                      value:
-                                          leadProvider
-                                                      .leadSouerceSelectedValue
-                                                      ?.isNotEmpty ==
-                                                  true
-                                              ? leadProvider
-                                                  .leadSouerceSelectedValue
-                                              : null,
-
-                                      isExpanded: true,
-
-                                      icon: const Icon(
-                                        Icons.keyboard_arrow_down_rounded,
-                                        color: Colors.white70,
+                              child: RefreshIndicator(
+                                onRefresh: () async {
+                                  leadProvider.getLeadSourcePro();
+                                  // Load customer profile
+                                  leadProvider.getCustomerProfilePro();
+                                },
+                                child: SingleChildScrollView(
+                                  physics: BouncingScrollPhysics(),
+                                  child: Column(
+                                    children: [
+                                      CustomTextFormFieldsWidget(
+                                        isTablet: isTablet,
+                                        title: "Client Name",
+                                        hintText: "Enter Client Name",
+                                        controller: clientNameController,
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Please enter client name';
+                                          }
+                                          return null;
+                                        },
                                       ),
+                                      const SizedBox(height: 20),
+                                      CustomTextFormFieldsWidget(
+                                        isTablet: isTablet,
+                                        title: "Company name",
+                                        hintText: "Enter Company Name",
+                                        controller: companyNameController,
 
-                                      dropdownColor: const Color.fromARGB(
-                                        255,
-                                        116,
-                                        122,
-                                        98,
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Please enter company name';
+                                          }
+                                          return null;
+                                        },
                                       ),
+                                      const SizedBox(height: 20),
+                                      CustomTextFormFieldsWidget(
+                                        isTablet: isTablet,
+                                        title: "Phone number",
+                                        hintText: "Enter Phone Number",
+                                        controller: phoneNumberController,
 
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: isTablet ? 20 : 16,
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Please enter phone number';
+                                          } else if (!RegExp(
+                                            r'^[0-9]{10}$',
+                                          ).hasMatch(value)) {
+                                            return 'Please enter a valid 10-digit phone number';
+                                          }
+                                          return null;
+                                        },
                                       ),
+                                      const SizedBox(height: 20),
+                                      CustomTextFormFieldsWidget(
+                                        isTablet: isTablet,
+                                        title: "Email",
+                                        hintText: "Enter Valid Email",
+                                        controller: emailController,
 
-                                      decoration: InputDecoration(
-                                        labelText: "Lead Source",
-                                        labelStyle: const TextStyle(
-                                          color: Colors.white60,
-                                        ),
-
-                                        filled: true,
-                                        fillColor: const Color(
-                                          0xFF82AE09,
-                                        ).withOpacity(0.15),
-
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                              horizontal: 14,
-                                              vertical: 14,
-                                            ),
-
-                                        // -------------------------
-                                        // 🔥 BEST Border Radius Setup
-                                        // -------------------------
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                          borderSide: const BorderSide(
-                                            color: Colors.blueGrey,
-                                          ),
-                                        ),
-
-                                        enabledBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                          borderSide: const BorderSide(
-                                            color: Colors.blueGrey,
-                                          ),
-                                        ),
-
-                                        focusedBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                          borderSide: const BorderSide(
-                                            color: Colors.white,
-                                          ),
-                                        ),
-
-                                        errorBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                          borderSide: const BorderSide(
-                                            color: Colors.redAccent,
-                                          ),
-                                        ),
-
-                                        focusedErrorBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                          borderSide: const BorderSide(
-                                            color: Colors.redAccent,
-                                          ),
-                                        ),
+                                        // validator: (value) {
+                                        //   if (value == null || value.isEmpty) {
+                                        //     return 'Please enter email address';
+                                        //   } else if (!RegExp(
+                                        //     r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                                        //   ).hasMatch(value)) {
+                                        //     return 'Please enter a valid email address';
+                                        //   }
+                                        //   return null;
+                                        // },
                                       ),
+                                      // const SizedBox(height: 20),
+                                      // CustomTextFormFieldsWidget(
+                                      //   isTablet: isTablet,
+                                      //   title: "Address",
+                                      //   hintText: "Enter Address",
+                                      //   maxLines: 3,
+                                      //   controller: addressController,
 
-                                      hint: const Text(
-                                        "Select Lead Source",
-                                        style: TextStyle(color: Colors.white54),
-                                      ),
+                                      //   validator: (value) {
+                                      //     if (value == null || value.isEmpty) {
+                                      //       return 'Please enter addrsss';
+                                      //     }
+                                      //     return null;
+                                      //   },
+                                      // ),
+                                      const SizedBox(height: 20),
+                                      DropdownButtonFormField<String>(
+                                        onTap: () async {
+                                          leadProvider.getLeadSourcePro();
+                                        },
+                                        value:
+                                            leadProvider
+                                                        .leadSouerceSelectedValue
+                                                        ?.isNotEmpty ==
+                                                    true
+                                                ? leadProvider
+                                                    .leadSouerceSelectedValue
+                                                : null,
 
-                                      items:
-                                          (leadProvider.leadSourceList ?? [])
-                                              .map(
-                                                (
-                                                  value,
-                                                ) => DropdownMenuItem<String>(
-                                                  value: value.id.toString(),
-                                                  child: Text(
-                                                    value.source ?? "Unknown",
-                                                  ),
-                                                ),
-                                              )
-                                              .toList(),
+                                        isExpanded: true,
 
-                                      onChanged: (value) {
-                                        leadProvider.leadSourceSelectedValuePro(
-                                          value,
-                                        );
-                                        print('sssssssssssss : ${value}');
-                                      },
+                                        icon: const Icon(
+                                          Icons.keyboard_arrow_down_rounded,
+                                          color: Colors.white70,
+                                        ),
 
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return "Please select an expense type";
-                                        }
-                                        return null;
-                                      },
-                                    ),
+                                        dropdownColor: const Color.fromARGB(
+                                          255,
+                                          116,
+                                          122,
+                                          98,
+                                        ),
 
-                                    // CustomTextFormFieldsWidget(
-                                    //   isTablet: isTablet,
-                                    //   title: "Lead Source",
-                                    //   hintText: "Enter Lead Source",
-                                    //   controller: leadSourceController,
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: isTablet ? 20 : 16,
+                                        ),
 
-                                    //   validator: (value) {
-                                    //     if (value == null || value.isEmpty) {
-                                    //       return 'Please enter lead source';
-                                    //     }
-                                    //     return null;
-                                    //   },
-                                    // ),
-                                    const SizedBox(height: 20),
-                                    CustomTextFormFieldsWidget(
-                                      isTablet: isTablet,
-                                      title: "Notes",
-                                      hintText: "Enter Notes",
-                                      maxLines: 3,
-                                      controller: addNoteController,
-
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Please enter note';
-                                        }
-                                        return null;
-                                      },
-                                    ),
-                                    const SizedBox(height: 20),
-
-                                    // /// Lead Status
-                                    // Column(
-                                    //   crossAxisAlignment:
-                                    //       CrossAxisAlignment.start,
-                                    //   children: [
-                                    //     Text(
-                                    //       'Lead Status',
-                                    //       style: TextStyle(
-                                    //         fontFamily: "MontrealSerial",
-                                    //         color: Colors.white60,
-                                    //         fontSize: 14,
-                                    //         fontWeight: FontWeight.w300,
-                                    //       ),
-                                    //     ),
-                                    //     const SizedBox(height: 20),
-                                    //     Container(
-                                    //       width: double.infinity,
-                                    //       height: 40,
-                                    //       decoration: BoxDecoration(
-                                    //         color: Colors.transparent,
-                                    //       ),
-                                    //       child:
-                                    //           (leadProvider.getLeadStatusList ==
-                                    //                       null ||
-                                    //                   leadProvider
-                                    //                       .getLeadStatusList!
-                                    //                       .isEmpty)
-                                    //               ? const Center(
-                                    //                 child: Text(
-                                    //                   "No lead status available",
-                                    //                   style: TextStyle(
-                                    //                     color: Colors.white70,
-                                    //                     fontSize: 14,
-                                    //                   ),
-                                    //                 ),
-                                    //               )
-                                    //               : ListView.separated(
-                                    //                 shrinkWrap: true,
-                                    //                 // physics: NeverScrollableScrollPhysics(),
-                                    //                 scrollDirection:
-                                    //                     Axis.horizontal,
-                                    //                 itemCount:
-                                    //                     leadProvider
-                                    //                         .getLeadStatusList!
-                                    //                         .length,
-                                    //                 itemBuilder: (
-                                    //                   context,
-                                    //                   index,
-                                    //                 ) {
-                                    //                   return InkWell(
-                                    //                     onTap: () {
-                                    //                       print(
-                                    //                         '${leadProvider.getLeadStatusList![index].id}',
-                                    //                       );
-                                    //                       print(
-                                    //                         '${leadProvider.getLeadStatusList![index].status}',
-                                    //                       );
-                                    //                       leadProvider.leadSelectIndex(
-                                    //                         leadProvider
-                                    //                             .getLeadStatusList![index]
-                                    //                             .status
-                                    //                             .toString(),
-                                    //                         leadProvider
-                                    //                             .getLeadStatusList![index]
-                                    //                             .id
-                                    //                             .toString(),
-                                    //                       );
-                                    //                     },
-                                    //                     child: Container(
-                                    //                       decoration: BoxDecoration(
-                                    //                         color:
-                                    //                             leadProvider.leadSelectedIndexName ==
-                                    //                                     leadProvider
-                                    //                                         .getLeadStatusList![index]
-                                    //                                         .status
-                                    //                                 ? Color.fromARGB(
-                                    //                                   101,
-                                    //                                   152,
-                                    //                                   202,
-                                    //                                   13,
-                                    //                                 )
-                                    //                                 : Color(
-                                    //                                   0xFF82AE09,
-                                    //                                 ).withOpacity(
-                                    //                                   0.15,
-                                    //                                 ),
-                                    //                         borderRadius:
-                                    //                             BorderRadius.circular(
-                                    //                               10,
-                                    //                             ),
-                                    //                         border: Border.all(
-                                    //                           color: Color(
-                                    //                             0xFF82AE09,
-                                    //                           ).withOpacity(
-                                    //                             0.25,
-                                    //                           ),
-                                    //                         ),
-                                    //                       ),
-                                    //                       child: Padding(
-                                    //                         padding:
-                                    //                             const EdgeInsets.all(
-                                    //                               8.0,
-                                    //                             ),
-                                    //                         child: Text(
-                                    //                           '${leadProvider.getLeadStatusList![index].status}',
-                                    //                           style: TextStyle(
-                                    //                             fontFamily:
-                                    //                                 "MontrealSerial",
-                                    //                             color:
-                                    //                                 Colors
-                                    //                                     .white70,
-                                    //                             fontSize: 15,
-                                    //                             fontWeight:
-                                    //                                 FontWeight
-                                    //                                     .w300,
-                                    //                           ),
-                                    //                         ),
-                                    //                       ),
-                                    //                     ),
-                                    //                   );
-                                    //                 },
-                                    //                 separatorBuilder: (
-                                    //                   context,
-                                    //                   index,
-                                    //                 ) {
-                                    //                   return SizedBox(
-                                    //                     width: 30,
-                                    //                   );
-                                    //                 },
-                                    //               ),
-                                    //     ),
-                                    //   ],
-                                    // ),
-                                    const SizedBox(height: 20),
-                                    // Customer profile
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Customer profile',
-                                          style: TextStyle(
-                                            fontFamily: "MontrealSerial",
+                                        decoration: InputDecoration(
+                                          labelText: "Lead Source",
+                                          labelStyle: const TextStyle(
                                             color: Colors.white60,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w300,
+                                          ),
+
+                                          filled: true,
+                                          fillColor: const Color(
+                                            0xFF82AE09,
+                                          ).withOpacity(0.15),
+
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                horizontal: 14,
+                                                vertical: 14,
+                                              ),
+
+                                          // -------------------------
+                                          // 🔥 BEST Border Radius Setup
+                                          // -------------------------
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                            borderSide: const BorderSide(
+                                              color: Colors.blueGrey,
+                                            ),
+                                          ),
+
+                                          enabledBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                            borderSide: const BorderSide(
+                                              color: Colors.blueGrey,
+                                            ),
+                                          ),
+
+                                          focusedBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                            borderSide: const BorderSide(
+                                              color: Colors.white,
+                                            ),
+                                          ),
+
+                                          errorBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                            borderSide: const BorderSide(
+                                              color: Colors.redAccent,
+                                            ),
+                                          ),
+
+                                          focusedErrorBorder:
+                                              OutlineInputBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                                borderSide: const BorderSide(
+                                                  color: Colors.redAccent,
+                                                ),
+                                              ),
+                                        ),
+
+                                        hint: const Text(
+                                          "Select Lead Source",
+                                          style: TextStyle(
+                                            color: Colors.white54,
                                           ),
                                         ),
-                                        const SizedBox(height: 20),
-                                        Container(
-                                          width: double.infinity,
-                                          height: 40,
-                                          decoration: BoxDecoration(
-                                            color: Colors.transparent,
-                                          ),
-                                          child:
-                                              (leadProvider.getCustomerProfileList ==
-                                                          null ||
-                                                      leadProvider
-                                                          .getCustomerProfileList!
-                                                          .isEmpty)
-                                                  ? const Center(
+
+                                        items:
+                                            (leadProvider.leadSourceList ?? [])
+                                                .map(
+                                                  (
+                                                    value,
+                                                  ) => DropdownMenuItem<String>(
+                                                    value: value.id.toString(),
                                                     child: Text(
-                                                      "No customer profile available",
-                                                      style: TextStyle(
-                                                        color: Colors.white70,
-                                                        fontSize: 14,
-                                                      ),
+                                                      value.source ?? "Unknown",
                                                     ),
-                                                  )
-                                                  : ListView.separated(
-                                                    shrinkWrap: true,
-                                                    // physics: NeverScrollableScrollPhysics(),
-                                                    scrollDirection:
-                                                        Axis.horizontal,
-                                                    itemCount:
+                                                  ),
+                                                )
+                                                .toList(),
+
+                                        onChanged: (value) {
+                                          leadProvider
+                                              .leadSourceSelectedValuePro(
+                                                value,
+                                              );
+                                          print('sssssssssssss : ${value}');
+                                        },
+
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return "Please select an expense type";
+                                          }
+                                          return null;
+                                        },
+                                      ),
+
+                                      // CustomTextFormFieldsWidget(
+                                      //   isTablet: isTablet,
+                                      //   title: "Lead Source",
+                                      //   hintText: "Enter Lead Source",
+                                      //   controller: leadSourceController,
+
+                                      //   validator: (value) {
+                                      //     if (value == null || value.isEmpty) {
+                                      //       return 'Please enter lead source';
+                                      //     }
+                                      //     return null;
+                                      //   },
+                                      // ),
+                                      const SizedBox(height: 20),
+                                      CustomTextFormFieldsWidget(
+                                        isTablet: isTablet,
+                                        title: "Notes",
+                                        hintText: "Enter Notes",
+                                        maxLines: 3,
+                                        controller: addNoteController,
+
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Please enter note';
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                      const SizedBox(height: 20),
+
+                                      // /// Lead Status
+                                      // Column(
+                                      //   crossAxisAlignment:
+                                      //       CrossAxisAlignment.start,
+                                      //   children: [
+                                      //     Text(
+                                      //       'Lead Status',
+                                      //       style: TextStyle(
+                                      //         fontFamily: "MontrealSerial",
+                                      //         color: Colors.white60,
+                                      //         fontSize: 14,
+                                      //         fontWeight: FontWeight.w300,
+                                      //       ),
+                                      //     ),
+                                      //     const SizedBox(height: 20),
+                                      //     Container(
+                                      //       width: double.infinity,
+                                      //       height: 40,
+                                      //       decoration: BoxDecoration(
+                                      //         color: Colors.transparent,
+                                      //       ),
+                                      //       child:
+                                      //           (leadProvider.getLeadStatusList ==
+                                      //                       null ||
+                                      //                   leadProvider
+                                      //                       .getLeadStatusList!
+                                      //                       .isEmpty)
+                                      //               ? const Center(
+                                      //                 child: Text(
+                                      //                   "No lead status available",
+                                      //                   style: TextStyle(
+                                      //                     color: Colors.white70,
+                                      //                     fontSize: 14,
+                                      //                   ),
+                                      //                 ),
+                                      //               )
+                                      //               : ListView.separated(
+                                      //                 shrinkWrap: true,
+                                      //                 // physics: NeverScrollableScrollPhysics(),
+                                      //                 scrollDirection:
+                                      //                     Axis.horizontal,
+                                      //                 itemCount:
+                                      //                     leadProvider
+                                      //                         .getLeadStatusList!
+                                      //                         .length,
+                                      //                 itemBuilder: (
+                                      //                   context,
+                                      //                   index,
+                                      //                 ) {
+                                      //                   return InkWell(
+                                      //                     onTap: () {
+                                      //                       print(
+                                      //                         '${leadProvider.getLeadStatusList![index].id}',
+                                      //                       );
+                                      //                       print(
+                                      //                         '${leadProvider.getLeadStatusList![index].status}',
+                                      //                       );
+                                      //                       leadProvider.leadSelectIndex(
+                                      //                         leadProvider
+                                      //                             .getLeadStatusList![index]
+                                      //                             .status
+                                      //                             .toString(),
+                                      //                         leadProvider
+                                      //                             .getLeadStatusList![index]
+                                      //                             .id
+                                      //                             .toString(),
+                                      //                       );
+                                      //                     },
+                                      //                     child: Container(
+                                      //                       decoration: BoxDecoration(
+                                      //                         color:
+                                      //                             leadProvider.leadSelectedIndexName ==
+                                      //                                     leadProvider
+                                      //                                         .getLeadStatusList![index]
+                                      //                                         .status
+                                      //                                 ? Color.fromARGB(
+                                      //                                   101,
+                                      //                                   152,
+                                      //                                   202,
+                                      //                                   13,
+                                      //                                 )
+                                      //                                 : Color(
+                                      //                                   0xFF82AE09,
+                                      //                                 ).withOpacity(
+                                      //                                   0.15,
+                                      //                                 ),
+                                      //                         borderRadius:
+                                      //                             BorderRadius.circular(
+                                      //                               10,
+                                      //                             ),
+                                      //                         border: Border.all(
+                                      //                           color: Color(
+                                      //                             0xFF82AE09,
+                                      //                           ).withOpacity(
+                                      //                             0.25,
+                                      //                           ),
+                                      //                         ),
+                                      //                       ),
+                                      //                       child: Padding(
+                                      //                         padding:
+                                      //                             const EdgeInsets.all(
+                                      //                               8.0,
+                                      //                             ),
+                                      //                         child: Text(
+                                      //                           '${leadProvider.getLeadStatusList![index].status}',
+                                      //                           style: TextStyle(
+                                      //                             fontFamily:
+                                      //                                 "MontrealSerial",
+                                      //                             color:
+                                      //                                 Colors
+                                      //                                     .white70,
+                                      //                             fontSize: 15,
+                                      //                             fontWeight:
+                                      //                                 FontWeight
+                                      //                                     .w300,
+                                      //                           ),
+                                      //                         ),
+                                      //                       ),
+                                      //                     ),
+                                      //                   );
+                                      //                 },
+                                      //                 separatorBuilder: (
+                                      //                   context,
+                                      //                   index,
+                                      //                 ) {
+                                      //                   return SizedBox(
+                                      //                     width: 30,
+                                      //                   );
+                                      //                 },
+                                      //               ),
+                                      //     ),
+                                      //   ],
+                                      // ),
+                                      const SizedBox(height: 20),
+                                      // Customer profile
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Customer profile',
+                                            style: TextStyle(
+                                              fontFamily: "MontrealSerial",
+                                              color: Colors.white60,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w300,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 20),
+                                          Container(
+                                            width: double.infinity,
+                                            height: 40,
+                                            decoration: BoxDecoration(
+                                              color: Colors.transparent,
+                                            ),
+                                            child:
+                                                (leadProvider.getCustomerProfileList ==
+                                                            null ||
                                                         leadProvider
                                                             .getCustomerProfileList!
-                                                            .length,
-                                                    itemBuilder: (
-                                                      context,
-                                                      index,
-                                                    ) {
-                                                      return InkWell(
-                                                        onTap: () {
-                                                          print(
-                                                            '${leadProvider.getCustomerProfileList![index].id}',
-                                                          );
-                                                          print(
-                                                            '${leadProvider.getCustomerProfileList![index].name}',
-                                                          );
-                                                          leadProvider.selectedCustomerProfileIndex(
-                                                            leadProvider
-                                                                .getCustomerProfileList![index]
-                                                                .name
-                                                                .toString(),
-                                                            leadProvider
-                                                                .getCustomerProfileList![index]
-                                                                .id
-                                                                .toString(),
-                                                          );
-                                                        },
-                                                        child: Container(
-                                                          decoration: BoxDecoration(
-                                                            color:
-                                                                leadProvider.customerProfileSelectedIndexName ==
-                                                                        leadProvider
-                                                                            .getCustomerProfileList![index]
-                                                                            .name
-                                                                    ? Color.fromARGB(
-                                                                      101,
-                                                                      152,
-                                                                      202,
-                                                                      13,
-                                                                    )
-                                                                    : Color(
-                                                                      0xFF82AE09,
-                                                                    ).withOpacity(
-                                                                      0.15,
-                                                                    ),
-                                                            borderRadius:
-                                                                BorderRadius.circular(
-                                                                  10,
-                                                                ),
-                                                            border: Border.all(
-                                                              color: Color(
-                                                                0xFF82AE09,
-                                                              ).withOpacity(
-                                                                0.25,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          child: Padding(
-                                                            padding:
-                                                                const EdgeInsets.all(
-                                                                  8.0,
-                                                                ),
-                                                            child: Text(
-                                                              '${leadProvider.getCustomerProfileList![index].name}',
-                                                              style: TextStyle(
-                                                                fontFamily:
-                                                                    "MontrealSerial",
-                                                                color:
-                                                                    Colors
-                                                                        .white70,
-                                                                fontSize: 15,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w300,
-                                                              ),
-                                                            ),
-                                                          ),
+                                                            .isEmpty)
+                                                    ? const Center(
+                                                      child: Text(
+                                                        "No customer profile available",
+                                                        style: TextStyle(
+                                                          color: Colors.white70,
+                                                          fontSize: 14,
                                                         ),
-                                                      );
-                                                    },
-                                                    separatorBuilder: (
-                                                      context,
-                                                      index,
-                                                    ) {
-                                                      return SizedBox(
-                                                        width: 30,
-                                                      );
-                                                    },
-                                                  ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 50),
-                                    InkWell(
-                                      onTap: () async {
-                                        print(
-                                          'client name ${clientNameController.text.toString()}',
-                                        );
-                                        print(
-                                          'client name ${clientNameController.text.toString()}',
-                                        );
-                                        print(
-                                          'company name ${companyNameController.text.toString()}',
-                                        );
-                                        print(
-                                          'phone number ${phoneNumberController.text.toString()}',
-                                        );
-                                        print(
-                                          'email ${emailController.text.toString()}',
-                                        );
-                                        print(
-                                          'address ${addressController.text.toString()}',
-                                        );
-                                        print(
-                                          'lead Source ${leadProvider.leadSouerceSelectedValue}',
-                                        );
-                                        print(
-                                          'add note ${addNoteController.text.toString()}',
-                                        );
-                                        print(
-                                          'lead status id ${leadProvider.leadSelectedId.toString()}',
-                                        );
-                                        print(
-                                          'lead status ${leadProvider.leadSelectedIndexName.toString()}',
-                                        );
-                                        print(
-                                          'customer pro id ${leadProvider.customerProfileSelectedIndexId.toString()}',
-                                        );
-                                        print(
-                                          'customer pro ${leadProvider.customerProfileSelectedIndexName.toString()}',
-                                        );
+                                                      ),
+                                                    )
+                                                    : ListView.separated(
+                                                      shrinkWrap: true,
+                                                      // physics: NeverScrollableScrollPhysics(),
+                                                      scrollDirection:
+                                                          Axis.horizontal,
+                                                      itemCount:
+                                                          leadProvider
+                                                              .getCustomerProfileList!
+                                                              .length,
+                                                      itemBuilder: (
+                                                        context,
+                                                        index,
+                                                      ) {
+                                                        return InkWell(
+                                                          onTap: () {
+                                                            print(
+                                                              '${leadProvider.getCustomerProfileList![index].id}',
+                                                            );
+                                                            print(
+                                                              '${leadProvider.getCustomerProfileList![index].name}',
+                                                            );
+                                                            leadProvider.selectedCustomerProfileIndex(
+                                                              leadProvider
+                                                                  .getCustomerProfileList![index]
+                                                                  .name
+                                                                  .toString(),
+                                                              leadProvider
+                                                                  .getCustomerProfileList![index]
+                                                                  .id
+                                                                  .toString(),
+                                                            );
+                                                          },
+                                                          child: Container(
+                                                            decoration: BoxDecoration(
+                                                              color:
+                                                                  leadProvider.customerProfileSelectedIndexName ==
+                                                                          leadProvider
+                                                                              .getCustomerProfileList![index]
+                                                                              .name
+                                                                      ? Color.fromARGB(
+                                                                        101,
+                                                                        152,
+                                                                        202,
+                                                                        13,
+                                                                      )
+                                                                      : Color(
+                                                                        0xFF82AE09,
+                                                                      ).withOpacity(
+                                                                        0.15,
+                                                                      ),
+                                                              borderRadius:
+                                                                  BorderRadius.circular(
+                                                                    10,
+                                                                  ),
+                                                              border: Border.all(
+                                                                color: Color(
+                                                                  0xFF82AE09,
+                                                                ).withOpacity(
+                                                                  0.25,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            child: Padding(
+                                                              padding:
+                                                                  const EdgeInsets.all(
+                                                                    8.0,
+                                                                  ),
+                                                              child: Text(
+                                                                '${leadProvider.getCustomerProfileList![index].name}',
+                                                                style: TextStyle(
+                                                                  fontFamily:
+                                                                      "MontrealSerial",
+                                                                  color:
+                                                                      Colors
+                                                                          .white70,
+                                                                  fontSize: 15,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w300,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        );
+                                                      },
+                                                      separatorBuilder: (
+                                                        context,
+                                                        index,
+                                                      ) {
+                                                        return SizedBox(
+                                                          width: 30,
+                                                        );
+                                                      },
+                                                    ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 50),
+                                      InkWell(
+                                        onTap: () async {
+                                          print(
+                                            'client name ${clientNameController.text.toString()}',
+                                          );
+                                          print(
+                                            'client name ${clientNameController.text.toString()}',
+                                          );
+                                          print(
+                                            'company name ${companyNameController.text.toString()}',
+                                          );
+                                          print(
+                                            'phone number ${phoneNumberController.text.toString()}',
+                                          );
+                                          print(
+                                            'email ${emailController.text.toString()}',
+                                          );
+                                          print(
+                                            'address ${addressController.text.toString()}',
+                                          );
+                                          print(
+                                            'lead Source ${leadProvider.leadSouerceSelectedValue}',
+                                          );
+                                          print(
+                                            'add note ${addNoteController.text.toString()}',
+                                          );
+                                          print(
+                                            'lead status id ${leadProvider.leadSelectedId.toString()}',
+                                          );
+                                          print(
+                                            'lead status ${leadProvider.leadSelectedIndexName.toString()}',
+                                          );
+                                          print(
+                                            'customer pro id ${leadProvider.customerProfileSelectedIndexId.toString()}',
+                                          );
+                                          print(
+                                            'customer pro ${leadProvider.customerProfileSelectedIndexName.toString()}',
+                                          );
 
-                                        if (formKey.currentState!.validate()) {
-                                          if (leadProvider
-                                                  .customerProfileSelectedIndexName !=
-                                              null) {
-                                            await leadProvider.addLeadPro(
-                                              clientNameController.text
-                                                  .toString(),
-                                              companyNameController.text
-                                                  .toString(),
-                                              phoneNumberController.text
-                                                  .toString(),
-                                              emailController.text.toString(),
-                                              addressController.text.toString(),
-                                              leadProvider
-                                                  .leadSouerceSelectedValue
-                                                  .toString(),
-                                              addNoteController.text.toString(),
-                                              // leadProvider.leadSelectedId
-                                              //     .toString(),
-                                              '',
-                                              leadProvider.leadSelectedIndexName
-                                                  .toString(),
-                                              leadProvider
-                                                  .customerProfileSelectedIndexId
-                                                  .toString(),
-                                              leadProvider
-                                                  .customerProfileSelectedIndexName
-                                                  .toString(),
-                                            );
-                                            if (leadProvider.success != null) {
-                                              // First load status
-                                              leadProvider.getLeadStatusPro();
-                                              // Then load lead data
-                                              leadProvider.getLeadPro(
+                                          if (formKey.currentState!
+                                              .validate()) {
+                                            if (leadProvider
+                                                    .customerProfileSelectedIndexName !=
+                                                null) {
+                                              await leadProvider.addLeadPro(
+                                                clientNameController.text
+                                                    .toString(),
+                                                companyNameController.text
+                                                    .toString(),
+                                                phoneNumberController.text
+                                                    .toString(),
+                                                emailController.text.toString(),
+                                                addressController.text
+                                                    .toString(),
+                                                leadProvider
+                                                    .leadSouerceSelectedValue
+                                                    .toString(),
+                                                addNoteController.text
+                                                    .toString(),
+                                                // leadProvider.leadSelectedId
+                                                //     .toString(),
                                                 '',
-                                                '',
-                                                isRefresh: true,
+                                                leadProvider
+                                                    .leadSelectedIndexName
+                                                    .toString(),
+                                                leadProvider
+                                                    .customerProfileSelectedIndexId
+                                                    .toString(),
+                                                leadProvider
+                                                    .customerProfileSelectedIndexName
+                                                    .toString(),
                                               );
+                                              if (leadProvider.success !=
+                                                  null) {
+                                                // First load status
+                                                leadProvider.getLeadStatusPro();
+                                                // Then load lead data
+                                                leadProvider.getLeadPro(
+                                                  '',
+                                                  '',
+                                                  isRefresh: true,
+                                                );
 
-                                              Navigator.pop(context);
-                                              showSuccessDialog(
+                                                Navigator.pop(context);
+                                                showSuccessDialog(
+                                                  context,
+                                                  "assets/images/successicons.png",
+                                                  "Success",
+                                                  "${leadProvider.success!.message}",
+                                                );
+                                                clientNameController.clear();
+                                                companyNameController.clear();
+                                                phoneNumberController.clear();
+                                                emailController.clear();
+                                                addressController.clear();
+                                                leadSourceController.clear();
+                                                addNoteController.clear();
+                                                leadProvider
+                                                    .clearLeadAndCustomerData();
+                                              }
+                                            } else {
+                                              showCustomSnackBar(
+                                                message:
+                                                    leadProvider.leadSelectedIndexName ==
+                                                            null
+                                                        ? 'Please select lead status'
+                                                        : 'Please select customer profile',
+                                                backgroundColor: Colors.red,
                                                 context,
-                                                "assets/images/successicons.png",
-                                                "Success",
-                                                "${leadProvider.success!.message}",
+                                                durationSeconds: 2,
                                               );
-                                              clientNameController.clear();
-                                              companyNameController.clear();
-                                              phoneNumberController.clear();
-                                              emailController.clear();
-                                              addressController.clear();
-                                              leadSourceController.clear();
-                                              addNoteController.clear();
-                                              leadProvider
-                                                  .clearLeadAndCustomerData();
                                             }
-                                          } else {
-                                            showCustomSnackBar(
-                                              message:
-                                                  leadProvider.leadSelectedIndexName ==
-                                                          null
-                                                      ? 'Please select lead status'
-                                                      : 'Please select customer profile',
-                                              backgroundColor: Colors.red,
-                                              context,
-                                              durationSeconds: 2,
-                                            );
                                           }
-                                        }
-                                      },
-                                      child: Container(
-                                        height: 50,
-                                        decoration: BoxDecoration(
-                                          color: kButtonColor2,
-                                          borderRadius: BorderRadius.circular(
-                                            15,
+                                        },
+                                        child: Container(
+                                          height: 50,
+                                          decoration: BoxDecoration(
+                                            color: kButtonColor2,
+                                            borderRadius: BorderRadius.circular(
+                                              15,
+                                            ),
+                                          ),
+                                          child: Center(
+                                            child: Text('Create Lead'),
                                           ),
                                         ),
-                                        child: Center(
-                                          child: Text('Create Lead'),
-                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(height: 100),
-                                  ],
+                                      const SizedBox(height: 100),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
@@ -823,7 +838,7 @@ class CustomTextFormFieldsWidget extends StatefulWidget {
     required this.hintText,
     this.maxLines,
     this.controller,
-    required this.validator,
+    this.validator,
   });
 
   final bool isTablet;

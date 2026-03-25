@@ -5,6 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wisdeals/core/failure.dart';
 import 'package:wisdeals/core/success.dart';
+import 'package:wisdeals/data/model/call_follow_up_languages/call_follow_up_languages.dart';
+import 'package:wisdeals/data/model/call_follow_up_note_model/call_follow_up_note_model.dart';
 import 'package:wisdeals/data/model/lead_managment_model/lead_customer_profile_model/lead_customer_profile_model.dart';
 import 'package:wisdeals/data/model/lead_managment_model/lead_managment_model.dart';
 import 'package:wisdeals/data/model/lead_managment_model/lead_status_model/lead_status_model.dart';
@@ -22,6 +24,7 @@ class LeadProvider extends ChangeNotifier {
   bool _isLoadingDelete = false;
   bool _isLoadingAddMeeting = false;
   bool _isLoadingLeadStatus = false;
+  bool _isLoadingCallNotes = false;
   bool _callLogFlag = false;
   String? _getFilterLeadIndex;
   String? _leadSelectedIndexName;
@@ -46,6 +49,12 @@ class LeadProvider extends ChangeNotifier {
   String? _leadIdForCallLog;
   int? _callLogShowHideIndex;
   int? _allMeetingSHowHideIndex;
+  String? _selectedCallFollowUpId;
+  String? _selectedCallFollowUpName;
+  bool _hideAndShowCallFollowUpForSelect = false;
+  String? _selectedCallLanguageId;
+  String? _selectedCallLanguageName;
+  bool _hideAndShowCallLanguage = false;
 
   // lead count
   String? _totalLeads;
@@ -59,11 +68,18 @@ class LeadProvider extends ChangeNotifier {
 
   String? _filterSelectedIndexName;
 
+  List<CallNote>? _getLeadCallNotes;
+  List<CallNote>? get getLeadCallNotes => _getLeadCallNotes;
+
+  List<CallLanguage>? _getLeadCallLanguage;
+  List<CallLanguage>? get getLeadCallLanguage => _getLeadCallLanguage;
+
   // getter
   bool get isLoading => _isLoading;
   bool get isLoadingDelete => _isLoadingDelete;
   bool get isLoadingAddMeeting => _isLoadingAddMeeting;
   bool get isLoadingLeadStatus => _isLoadingLeadStatus;
+  bool get isLoadingCallNotes => _isLoadingCallNotes;
   bool get callLogFlag => _callLogFlag;
   String? get getFilterLeadIndex => _getFilterLeadIndex;
   String? get leadSelectedIndexName => _leadSelectedIndexName;
@@ -106,7 +122,50 @@ class LeadProvider extends ChangeNotifier {
   String? _leadSouerceSelectedValue;
   String? get leadSouerceSelectedValue => _leadSouerceSelectedValue;
 
+  String? get selectedCallFollowUpId => _selectedCallFollowUpId;
+  String? get selectedCallFollowUpName => _selectedCallFollowUpName;
+  bool get hideAndShowCallFollowUpForSelect =>
+      _hideAndShowCallFollowUpForSelect;
+  String? get selectedCallLanguageId => _selectedCallLanguageId;
+  String? get selectedCallLanguageName => _selectedCallLanguageName;
+  bool get hideAndShowCallLanguage => _hideAndShowCallLanguage;
+
   // functions
+
+  void hideAndShowCallFollowUpForSelectPro() {
+    _hideAndShowCallFollowUpForSelect = !_hideAndShowCallFollowUpForSelect;
+    notifyListeners();
+  }
+
+  void hideAndShowCallLanguagePro() {
+    _hideAndShowCallLanguage = !_hideAndShowCallLanguage;
+    notifyListeners();
+  }
+
+  void selectCallFolowUp(
+    String? selectCallFolowUpId,
+    String? selectCallFolowUpTitle,
+  ) {
+    _selectedCallFollowUpId = selectCallFolowUpId;
+    _selectedCallFollowUpName = selectCallFolowUpTitle;
+    notifyListeners();
+  }
+
+  void selectCallLanguagePro(
+    String? selectCallLanguageIds,
+    String? selectCallLanguageTitles,
+  ) {
+    _selectedCallLanguageId = selectCallLanguageIds;
+    _selectedCallLanguageName = selectCallLanguageTitles;
+    notifyListeners();
+  }
+
+  void clearWhenLanguageNotselected() {
+    print('clear when select not language');
+    _selectedCallLanguageId = '';
+    _selectedCallLanguageName = '';
+    notifyListeners();
+  }
 
   void callShowHideIndex(int? index) {
     if (_callLogShowHideIndex == index) {
@@ -180,6 +239,15 @@ class LeadProvider extends ChangeNotifier {
   void clearFailure() {
     print('clear failure called');
     _failure = null;
+    notifyListeners();
+  }
+
+  void clearSelectdData() {
+    print('clear failure called');
+    _selectedCallFollowUpId = '';
+    _selectedCallFollowUpName = '';
+    _selectedCallLanguageId = '';
+    _selectedCallLanguageName = '';
     notifyListeners();
   }
 
@@ -275,20 +343,24 @@ class LeadProvider extends ChangeNotifier {
   }
 
   void getFilterLeadSection() {
-    // Step 1: calculate total leads
-    final totalLeadsCount = leadDataList?.length ?? 0;
-    final allCount = leadDataList!.where((lead) => lead.leadStatus == 'All');
-
+    // // Step 1: calculate total leads
+    // final totalLeadsCount = leadDataList?.length ?? 0;
+    // final allCount = leadDataList!.where((lead) => lead.leadStatus == 'All');
+    if (getLeadStatusList == null || getLeadStatusList!.isEmpty) {
+      _filterStringLead = [];
+      notifyListeners();
+      return;
+    }
     // Step 2: build dynamic list from API
     final dynamicList =
         getLeadStatusList!.map((statusItem) {
           final status = statusItem.status ?? '';
           print('11111111111111 : ${status}');
           final statusid = statusItem.id ?? '';
-          final leadCount = statusItem.leadCount ?? '';
-          final allCount = leadDataList!.where(
-            (lead) => lead.leadStatus == 'All',
-          );
+          final leadCount = statusItem.leadCount ?? '0';
+          // final allCount = leadDataList!.where(
+          //   (lead) => lead.leadStatus == 'All',
+          // );
 
           return {
             'image': _getStatusImage(status),
@@ -394,10 +466,10 @@ class LeadProvider extends ChangeNotifier {
     String? leadStatusId, {
     bool isRefresh = false,
   }) async {
-    print('current page prooo : ${currentPage}');
-    print('leadStatusId  pro: ${leadStatusId}');
-    print('refresh main loading : ${isRefresh}');
-    print('refresh main loading : ${isRefresh}');
+    print('current page prooo : ${currentPage ?? ''}');
+    print('leadStatusId  pro: ${leadStatusId ?? ''}');
+    print('refresh main loading : ${isRefresh ?? ''}');
+    print('refresh main loading : ${isRefresh ?? ''}');
     if (_currentPage == 1) {
       _currentPage++;
       notifyListeners();
@@ -465,10 +537,10 @@ class LeadProvider extends ChangeNotifier {
         }
 
         // Copy extra params
-        _totalLeads = success.totalLeads.toString();
-        _convertedLeads = success.convertedLeads.toString();
-        _pendingLeads = success.pendingFollowups.toString();
-        _lostLeads = success.lostLeads.toString();
+        _totalLeads = success.totalLeads?.toString() ?? "0";
+        _convertedLeads = success.convertedLeads?.toString() ?? "0";
+        _pendingLeads = success.pendingFollowups?.toString() ?? "0";
+        _lostLeads = success.lostLeads?.toString() ?? "0";
 
         print('total : ${_totalLeads}');
         print('converted  : ${_convertedLeads}');
@@ -744,7 +816,8 @@ class LeadProvider extends ChangeNotifier {
   Future<void> leadAddcallLogsPro(
     String? clientId,
     String? leadId,
-    String? notes,
+    String? notesId,
+    String? languageId,
   ) async {
     _isLoading = true;
     _success = null;
@@ -757,7 +830,8 @@ class LeadProvider extends ChangeNotifier {
       token,
       clientId,
       leadId,
-      notes,
+      notesId,
+      languageId,
     );
     result.fold(
       (failure) async {
@@ -837,6 +911,62 @@ class LeadProvider extends ChangeNotifier {
       (success) {
         _success = success;
         _isLoadingDelete = false;
+        notifyListeners();
+      },
+    );
+  }
+
+  Future<void> getLeadCallNotePro() async {
+    _isLoadingCallNotes = true;
+    _failure = null;
+    notifyListeners();
+    final SharedPreferences pref = await SharedPreferences.getInstance();
+    String? token = pref.getString('token');
+    print('inside lead call note pro : token ${token}');
+    final result = await leadManagmentRepository.getLeadCallNote(token);
+
+    result.fold(
+      (failure) async {
+        if (failure is AuthFailure) {
+          print('vvvvvvvvvvvvvvvvvvvv...${failure.message}');
+          await AuthService.forceLogout();
+        }
+        _isLoadingCallNotes = false;
+        _failure = failure;
+        notifyListeners();
+      },
+      (success) {
+        _getLeadCallNotes = success;
+        _isLoadingCallNotes = false;
+        getFilterLeadSection();
+        notifyListeners();
+      },
+    );
+  }
+
+  Future<void> getLeadCallLanguagePro() async {
+    _isLoadingCallNotes = true;
+    _failure = null;
+    notifyListeners();
+    final SharedPreferences pref = await SharedPreferences.getInstance();
+    String? token = pref.getString('token');
+    print('inside lead call note pro : token ${token}');
+    final result = await leadManagmentRepository.getLeadCallLAnguage(token);
+
+    result.fold(
+      (failure) async {
+        if (failure is AuthFailure) {
+          print('vvvvvvvvvvvvvvvvvvvv...${failure.message}');
+          await AuthService.forceLogout();
+        }
+        _isLoadingCallNotes = false;
+        _failure = failure;
+        notifyListeners();
+      },
+      (success) {
+        _getLeadCallLanguage = success;
+        _isLoadingCallNotes = false;
+        getFilterLeadSection();
         notifyListeners();
       },
     );

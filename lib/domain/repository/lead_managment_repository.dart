@@ -1,6 +1,8 @@
 import 'package:dartz/dartz.dart';
 import 'package:wisdeals/core/failure.dart';
 import 'package:wisdeals/core/success.dart';
+import 'package:wisdeals/data/model/call_follow_up_languages/call_follow_up_languages.dart';
+import 'package:wisdeals/data/model/call_follow_up_note_model/call_follow_up_note_model.dart';
 import 'package:wisdeals/data/model/lead_managment_model/lead_customer_profile_model/lead_customer_profile_model.dart';
 import 'package:wisdeals/data/model/lead_managment_model/lead_managment_model.dart';
 import 'package:wisdeals/data/model/lead_managment_model/lead_status_model/lead_status_model.dart';
@@ -71,7 +73,8 @@ abstract class LeadManagmentRepository {
     String? token,
     String? clientId,
     String? leadId,
-    String? note,
+    String? noteId,
+    String? languageId,
   );
 
   Future<Either<Failure, List<LeadStatus>?>> getLeadStatus(String? token);
@@ -84,5 +87,10 @@ abstract class LeadManagmentRepository {
   Future<Either<Failure, Success>> deleteLeadMeeting(
     String? token,
     String? meetingId,
+  );
+
+  Future<Either<Failure, List<CallNote>?>> getLeadCallNote(String? token);
+  Future<Either<Failure, List<CallLanguage>?>> getLeadCallLAnguage(
+    String? token,
   );
 }

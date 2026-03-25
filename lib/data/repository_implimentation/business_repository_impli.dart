@@ -16,6 +16,7 @@ class BusinessRepositoryImpli implements BusinessRepository {
   @override
   Future<Either<Failure, BusinessClientNameModel>> getBusinessClientName(
     String? token,
+    String? search,
     String? currentPage,
   ) async {
     print('current page ${currentPage}');
@@ -24,7 +25,7 @@ class BusinessRepositoryImpli implements BusinessRepository {
     try {
       final response = await client.get(
         Uri.parse(
-          "${ApiEndPoint.baseUrl}${ApiEndPoint.clientNameEndPoint}?per_page=${currentPage}",
+          "${ApiEndPoint.baseUrl}${ApiEndPoint.clientNameEndPoint}?per_page=${currentPage}&search=${search}",
         ),
         headers: {'Authorization': 'Bearer $token'},
       );
@@ -86,12 +87,15 @@ class BusinessRepositoryImpli implements BusinessRepository {
   @override
   Future<Either<Failure, List<BusinessName>>> getBusinessName(
     String? token,
+    String? search,
   ) async {
     final client = http.Client();
 
     try {
       final response = await client.get(
-        Uri.parse("${ApiEndPoint.baseUrl}${ApiEndPoint.businessNameEndPoint}"),
+        Uri.parse(
+          "${ApiEndPoint.baseUrl}${ApiEndPoint.businessNameEndPoint}?search=${search}",
+        ),
         headers: {'Authorization': 'Bearer $token'},
       );
 

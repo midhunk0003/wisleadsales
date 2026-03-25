@@ -134,7 +134,7 @@ class CollectedPaymentsList {
   @JsonKey(name: 'collected_date', fromJson: _stringFromDynamic)
   String? collecteDate;
 
-  CollectedPaymentsList({this.id, this.amount});
+  CollectedPaymentsList({this.id, this.amount, this.collecteDate});
 
   factory CollectedPaymentsList.fromJson(Map<String, dynamic> json) {
     return _$CollectedPaymentsListFromJson(json);

@@ -130,6 +130,7 @@ CallLogModel _$CallLogModelFromJson(Map<String, dynamic> json) => CallLogModel(
   clientId: (json['client_id'] as num?)?.toInt(),
   leadId: (json['lead_id'] as num?)?.toInt(),
   notes: json['notes'] as String?,
+  language: json['language'] as String?,
   createdAt:
       json['created_at'] == null
           ? null
@@ -147,6 +148,7 @@ Map<String, dynamic> _$CallLogModelToJson(CallLogModel instance) =>
       'client_id': instance.clientId,
       'lead_id': instance.leadId,
       'notes': instance.notes,
+      'language': instance.language,
       'created_at': instance.createdAt?.toIso8601String(),
       'updated_at': instance.updatedAt?.toIso8601String(),
       'deleted_at': instance.deletedAt,

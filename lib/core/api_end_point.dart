@@ -2,13 +2,13 @@ class ApiEndPoint {
   // static const String baseUrl = "http://192.168.29.195:8000/api/";
   // static const String photoBaseUrl = "http://192.168.29.195:8000/storage/";
 
-  static const String baseUrl = "https://app.wisleadcrm.com/api/";
-  static const String photoBaseUrl =
-      "https://app.wisleadcrm.com/storage/app/public/";
-
-  // static const String baseUrl = "https://teams.wwitpl.com/sales-backend/api/";
+  // static const String baseUrl = "https://app.wisleadcrm.com/api/";
   // static const String photoBaseUrl =
-  //     "https://teams.wwitpl.com/sales-backend/storage/app/public/";
+  //     "https://app.wisleadcrm.com/storage/app/public/";
+
+  static const String baseUrl = "https://teams.wwitpl.com/sales-backend/api/";
+  static const String photoBaseUrl =
+      "https://teams.wwitpl.com/sales-backend/storage/app/public/";
 
   // https://teams.wwitpl.com/sales-backend/api/login
   // http://app.wisleadcrm.com/api/login
@@ -47,6 +47,8 @@ class ApiEndPoint {
   static const String customerProfileEndPoint = "customerProfile";
   static const String leadStatusSummaryEndPoint = "LeadStatusSummary";
   static const String leadSourceEndPoint = "leadSource";
+  static const String leadCallNotesEndPoint = "notes";
+  static const String leadCallLanguageEndPoint = "languages";
 
   // delete lead and client meeting
   static const String deleteMeetingEndPoint = "DeleteMeeting";

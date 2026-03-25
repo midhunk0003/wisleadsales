@@ -35,6 +35,8 @@ class _LeadListScreenState extends State<LeadListScreen> {
   final ScrollController scrollcontrollers = ScrollController();
   // call log controller
   final TextEditingController callLogNoteController = TextEditingController();
+  final TextEditingController callLogLanguageController =
+      TextEditingController();
 
   @override
   void initState() {
@@ -297,25 +299,43 @@ class _LeadListScreenState extends State<LeadListScreen> {
                                             leadProvider
                                                 .searchdLeadList!
                                                 .isEmpty)
-                                        ? Center(
-                                          child: Container(
+                                        ? Expanded(
+                                          child: RefreshIndicator(
+                                            onRefresh: () async {
+                                              _loadLeadData();
+                                            },
                                             child: SingleChildScrollView(
-                                              child: Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  Lottie.asset(
-                                                    'assets/json/noevents.json',
-                                                    width: 150,
+                                              physics:
+                                                  AlwaysScrollableScrollPhysics(),
+                                              child: SizedBox(
+                                                height:
+                                                    MediaQuery.of(
+                                                      context,
+                                                    ).size.height *
+                                                    0.6,
+
+                                                child: Center(
+                                                  child: Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: [
+                                                      Lottie.asset(
+                                                        'assets/json/noevents.json',
+                                                        width: 150,
+                                                      ),
+                                                      const SizedBox(
+                                                        height: 10,
+                                                      ),
+                                                      const Text(
+                                                        'No Lead Found',
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 16,
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
-                                                  const SizedBox(height: 10),
-                                                  const Text(
-                                                    'No Lead Found',
-                                                    style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 16,
-                                                    ),
-                                                  ),
-                                                ],
+                                                ),
                                               ),
                                             ),
                                           ),
@@ -327,7 +347,8 @@ class _LeadListScreenState extends State<LeadListScreen> {
                                           child: ListView.separated(
                                             controller: scrollcontrollers,
                                             shrinkWrap: false,
-                                            physics: BouncingScrollPhysics(),
+                                            physics:
+                                                AlwaysScrollableScrollPhysics(),
                                             itemCount:
                                                 leadProvider
                                                     .searchdLeadList!
@@ -1197,6 +1218,20 @@ class _LeadListScreenState extends State<LeadListScreen> {
                                                                                               4,
                                                                                         ),
                                                                                         Text(
+                                                                                          call.language ??
+                                                                                              'No Language',
+                                                                                          style: const TextStyle(
+                                                                                            fontWeight:
+                                                                                                FontWeight.w500,
+                                                                                            fontSize:
+                                                                                                14,
+                                                                                          ),
+                                                                                        ),
+                                                                                        const SizedBox(
+                                                                                          height:
+                                                                                              4,
+                                                                                        ),
+                                                                                        Text(
                                                                                           'Duration: ${formattedTime ?? 'N/A'}',
                                                                                           style: const TextStyle(
                                                                                             fontSize:
@@ -1448,78 +1483,638 @@ class _LeadListScreenState extends State<LeadListScreen> {
                                               style: TextStyle(fontSize: 18),
                                             ),
                                             SizedBox(height: 10),
-                                            Text('Enter Call Log Details...'),
+                                            Text('Select Call Log Status...'),
                                             SizedBox(height: 10),
                                             TextFormField(
+                                              readOnly: true,
                                               controller: callLogNoteController,
                                               decoration: InputDecoration(
-                                                hintText: "ex : Not Attend...",
-                                                border: OutlineInputBorder(),
-                                              ),
-                                            ),
-                                            const SizedBox(height: 12),
-                                            ElevatedButton(
-                                              onPressed: () async {
-                                                print(
-                                                  'Reason: ${leadProvider.leadIdForCallLog}',
-                                                );
-                                                if (callLogNoteController
-                                                    .text
-                                                    .isNotEmpty) {
-                                                  await leadProvider
-                                                      .leadAddcallLogsPro(
-                                                        '',
-                                                        leadProvider
-                                                            .leadIdForCallLog,
-                                                        callLogNoteController
-                                                            .text
-                                                            .toString(),
-                                                      );
-                                                  if (leadProvider.success !=
-                                                      null) {
-                                                    leadProvider
-                                                        .callLogFlagPro();
-                                                    showSuccessDialog(
-                                                      context,
-                                                      "assets/images/successicons.png",
-                                                      "Success",
-                                                      "${leadProvider.success!.message}",
-                                                    );
-                                                    leadProvider.getLeadPro(
-                                                      '',
-                                                      '',
-                                                      isRefresh: true,
-                                                    );
-                                                  }
-                                                } else {
-                                                  ScaffoldMessenger.of(
-                                                    context,
-                                                  ).showSnackBar(
-                                                    SnackBar(
-                                                      content: const Text(
-                                                        'Please enter a call reason before submitting.',
-                                                        style: TextStyle(
-                                                          color: Colors.white,
-                                                        ),
-                                                      ),
-                                                      backgroundColor:
-                                                          Colors.redAccent,
-                                                      behavior:
-                                                          SnackBarBehavior
-                                                              .floating, // ✅ Floating snackbar
-                                                      margin:
-                                                          const EdgeInsets.all(
-                                                            10,
+                                                hintText: "ex : Interested...",
+                                                border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                        20,
+                                                      ), // 👈 change radius here
+                                                ),
+
+                                                enabledBorder:
+                                                    OutlineInputBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            20,
                                                           ),
-                                                      duration: const Duration(
-                                                        seconds: 2,
+                                                      borderSide: BorderSide(
+                                                        color: Colors.grey,
                                                       ),
                                                     ),
-                                                  );
-                                                }
+
+                                                focusedBorder:
+                                                    OutlineInputBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            20,
+                                                          ),
+                                                      borderSide: BorderSide(
+                                                        color: Colors.blue,
+                                                        width: 2,
+                                                      ),
+                                                    ),
+                                                suffixIcon: Icon(
+                                                  leadProvider
+                                                          .hideAndShowCallFollowUpForSelect
+                                                      ? Icons
+                                                          .arrow_drop_up_outlined
+                                                      : Icons
+                                                          .arrow_drop_down_outlined,
+                                                ),
+                                              ),
+                                              onTap: () {
+                                                print('Interested');
+                                                leadProvider
+                                                    .hideAndShowCallFollowUpForSelectPro();
+                                                leadProvider
+                                                    .getLeadCallNotePro();
                                               },
-                                              child: Text(
-                                                '${leadProvider.isLoading ? 'Loading.....' : 'Submit'}',
+                                            ),
+                                            const SizedBox(height: 5),
+                                            AnimatedContainer(
+                                              duration: Duration(
+                                                milliseconds: 300,
+                                              ),
+                                              curve: Curves.easeInOut,
+                                              height:
+                                                  leadProvider
+                                                          .hideAndShowCallFollowUpForSelect
+                                                      ? 140
+                                                      : 0,
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                                border: Border.all(
+                                                  color: Colors.grey.shade300,
+                                                ),
+                                                boxShadow:
+                                                    leadProvider
+                                                            .hideAndShowCallFollowUpForSelect
+                                                        ? [
+                                                          BoxShadow(
+                                                            color: Colors.black
+                                                                .withOpacity(
+                                                                  0.05,
+                                                                ),
+                                                            blurRadius: 8,
+                                                            offset: Offset(
+                                                              0,
+                                                              3,
+                                                            ),
+                                                          ),
+                                                        ]
+                                                        : [],
+                                              ),
+                                              child: ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                                child:
+                                                    leadProvider
+                                                            .hideAndShowCallFollowUpForSelect
+                                                        ? (leadProvider
+                                                                    .isLoadingCallNotes ||
+                                                                leadProvider
+                                                                        .getLeadCallNotes ==
+                                                                    null)
+                                                            ? Center(
+                                                              child:
+                                                                  CircularProgressIndicator(),
+                                                            )
+                                                            : (leadProvider
+                                                                    .isLoadingCallNotes ||
+                                                                leadProvider
+                                                                        .getLeadCallNotes ==
+                                                                    null)
+                                                            ? Center(
+                                                              child: Text(
+                                                                'Status Empty',
+                                                              ),
+                                                            )
+                                                            : ListView.separated(
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .zero,
+                                                              itemCount:
+                                                                  leadProvider
+                                                                      .getLeadCallNotes!
+                                                                      .length,
+                                                              itemBuilder: (
+                                                                context,
+                                                                index,
+                                                              ) {
+                                                                final data =
+                                                                    leadProvider
+                                                                        .getLeadCallNotes![index];
+                                                                final isSelected =
+                                                                    leadProvider
+                                                                        .selectedCallFollowUpId ==
+                                                                    data.id; // 👈 key line
+                                                                return InkWell(
+                                                                  onTap: () {
+                                                                    leadProvider.selectCallFolowUp(
+                                                                      data.id ??
+                                                                          '',
+                                                                      data.title ??
+                                                                          '',
+                                                                    );
+                                                                    callLogNoteController
+                                                                            .text =
+                                                                        leadProvider
+                                                                            .selectedCallFollowUpName ??
+                                                                        '';
+                                                                    leadProvider
+                                                                        .hideAndShowCallFollowUpForSelectPro();
+                                                                    if (leadProvider
+                                                                            .selectedCallLanguageName!
+                                                                            .toLowerCase() !=
+                                                                        "language") {
+                                                                      print(
+                                                                        '0000000000000000000000000000000',
+                                                                      );
+                                                                      callLogLanguageController
+                                                                          .text = '';
+                                                                      leadProvider
+                                                                          .clearWhenLanguageNotselected();
+                                                                    }
+                                                                  },
+                                                                  child: Padding(
+                                                                    padding: const EdgeInsets.symmetric(
+                                                                      horizontal:
+                                                                          16,
+                                                                      vertical:
+                                                                          12,
+                                                                    ),
+                                                                    child: Row(
+                                                                      children: [
+                                                                        Icon(
+                                                                          Icons
+                                                                              .check_circle,
+                                                                          size:
+                                                                              18,
+                                                                          color:
+                                                                              isSelected
+                                                                                  ? Colors.green
+                                                                                  : Colors.grey,
+                                                                        ),
+                                                                        SizedBox(
+                                                                          width:
+                                                                              10,
+                                                                        ),
+                                                                        Expanded(
+                                                                          child: Text(
+                                                                            data.title ??
+                                                                                '',
+                                                                            style: TextStyle(
+                                                                              fontSize:
+                                                                                  14,
+                                                                              fontWeight:
+                                                                                  FontWeight.w500,
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                );
+                                                              },
+                                                              separatorBuilder:
+                                                                  (
+                                                                    _,
+                                                                    __,
+                                                                  ) => Padding(
+                                                                    padding: const EdgeInsets.symmetric(
+                                                                      horizontal:
+                                                                          16,
+                                                                    ),
+                                                                    child: Divider(
+                                                                      color:
+                                                                          Colors
+                                                                              .grey
+                                                                              .shade200,
+                                                                      height: 1,
+                                                                    ),
+                                                                  ),
+                                                            )
+                                                        : null,
+                                              ),
+                                            ),
+
+                                            SizedBox(height: 10),
+                                            (leadProvider.selectedCallFollowUpName ??
+                                                        '')
+                                                    .toLowerCase()
+                                                    .contains("language")
+                                                ? Text('Select Call Language')
+                                                : SizedBox.shrink(),
+                                            // select language
+                                            SizedBox(height: 10),
+
+                                            (leadProvider.selectedCallFollowUpName ??
+                                                        '')
+                                                    .toLowerCase()
+                                                    .contains("language")
+                                                ? TextFormField(
+                                                  readOnly: true,
+                                                  controller:
+                                                      callLogLanguageController,
+                                                  decoration: InputDecoration(
+                                                    hintText:
+                                                        "ex : Hindi,English...",
+                                                    border: OutlineInputBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            20,
+                                                          ),
+                                                    ),
+                                                    enabledBorder:
+                                                        OutlineInputBorder(
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                20,
+                                                              ),
+                                                          borderSide:
+                                                              BorderSide(
+                                                                color:
+                                                                    Colors.grey,
+                                                              ),
+                                                        ),
+                                                    focusedBorder:
+                                                        OutlineInputBorder(
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                20,
+                                                              ),
+                                                          borderSide:
+                                                              BorderSide(
+                                                                color:
+                                                                    Colors.blue,
+                                                                width: 2,
+                                                              ),
+                                                        ),
+                                                    suffixIcon: Icon(
+                                                      leadProvider
+                                                              .hideAndShowCallFollowUpForSelect
+                                                          ? Icons
+                                                              .arrow_drop_up_outlined
+                                                          : Icons
+                                                              .arrow_drop_down_outlined,
+                                                    ),
+                                                  ),
+                                                  onTap: () {
+                                                    print('Language clicked');
+                                                    leadProvider
+                                                        .hideAndShowCallLanguagePro();
+                                                    leadProvider
+                                                        .getLeadCallLanguagePro();
+                                                  },
+                                                )
+                                                : SizedBox(),
+                                            const SizedBox(height: 5),
+
+                                            (leadProvider.selectedCallFollowUpName ??
+                                                        '')
+                                                    .toLowerCase()
+                                                    .contains("language")
+                                                ? AnimatedContainer(
+                                                  duration: Duration(
+                                                    milliseconds: 300,
+                                                  ),
+                                                  curve: Curves.easeInOut,
+                                                  height:
+                                                      leadProvider
+                                                              .hideAndShowCallLanguage
+                                                          ? 140
+                                                          : 0,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.white,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          20,
+                                                        ),
+                                                    border: Border.all(
+                                                      color:
+                                                          Colors.grey.shade300,
+                                                    ),
+                                                    boxShadow:
+                                                        leadProvider
+                                                                .hideAndShowCallLanguage
+                                                            ? [
+                                                              BoxShadow(
+                                                                color: Colors
+                                                                    .black
+                                                                    .withOpacity(
+                                                                      0.05,
+                                                                    ),
+                                                                blurRadius: 8,
+                                                                offset: Offset(
+                                                                  0,
+                                                                  3,
+                                                                ),
+                                                              ),
+                                                            ]
+                                                            : [],
+                                                  ),
+                                                  child: ClipRRect(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          20,
+                                                        ),
+                                                    child:
+                                                        leadProvider
+                                                                .hideAndShowCallLanguage
+                                                            ? (leadProvider
+                                                                        .isLoadingCallNotes ||
+                                                                    leadProvider
+                                                                            .getLeadCallNotes ==
+                                                                        null)
+                                                                ? Center(
+                                                                  child:
+                                                                      CircularProgressIndicator(),
+                                                                )
+                                                                : (leadProvider
+                                                                        .isLoadingCallNotes ||
+                                                                    leadProvider
+                                                                            .getLeadCallNotes ==
+                                                                        null)
+                                                                ? Center(
+                                                                  child: Text(
+                                                                    'Status Empty',
+                                                                  ),
+                                                                )
+                                                                : ListView.separated(
+                                                                  padding:
+                                                                      EdgeInsets
+                                                                          .zero,
+                                                                  itemCount:
+                                                                      leadProvider
+                                                                          .getLeadCallLanguage!
+                                                                          .length,
+                                                                  itemBuilder: (
+                                                                    context,
+                                                                    index,
+                                                                  ) {
+                                                                    final dataLang =
+                                                                        leadProvider
+                                                                            .getLeadCallLanguage![index];
+                                                                    final isSelected =
+                                                                        leadProvider
+                                                                            .selectedCallLanguageId ==
+                                                                        dataLang
+                                                                            .id; // 👈 key line
+                                                                    return InkWell(
+                                                                      onTap: () {
+                                                                        leadProvider.selectCallLanguagePro(
+                                                                          dataLang.id ??
+                                                                              '',
+                                                                          dataLang.name ??
+                                                                              '',
+                                                                        );
+                                                                        callLogLanguageController.text =
+                                                                            leadProvider.selectedCallLanguageName ??
+                                                                            '';
+                                                                        leadProvider
+                                                                            .hideAndShowCallLanguagePro();
+                                                                      },
+                                                                      child: Padding(
+                                                                        padding: const EdgeInsets.symmetric(
+                                                                          horizontal:
+                                                                              16,
+                                                                          vertical:
+                                                                              12,
+                                                                        ),
+                                                                        child: Row(
+                                                                          children: [
+                                                                            Icon(
+                                                                              Icons.check_circle,
+                                                                              size:
+                                                                                  18,
+                                                                              color:
+                                                                                  isSelected
+                                                                                      ? Colors.green
+                                                                                      : Colors.grey,
+                                                                            ),
+                                                                            SizedBox(
+                                                                              width:
+                                                                                  10,
+                                                                            ),
+                                                                            Expanded(
+                                                                              child: Text(
+                                                                                dataLang.name ??
+                                                                                    '',
+                                                                                style: TextStyle(
+                                                                                  fontSize:
+                                                                                      14,
+                                                                                  fontWeight:
+                                                                                      FontWeight.w500,
+                                                                                ),
+                                                                              ),
+                                                                            ),
+                                                                          ],
+                                                                        ),
+                                                                      ),
+                                                                    );
+                                                                  },
+                                                                  separatorBuilder:
+                                                                      (
+                                                                        _,
+                                                                        __,
+                                                                      ) => Padding(
+                                                                        padding: const EdgeInsets.symmetric(
+                                                                          horizontal:
+                                                                              16,
+                                                                        ),
+                                                                        child: Divider(
+                                                                          color:
+                                                                              Colors.grey.shade200,
+                                                                          height:
+                                                                              1,
+                                                                        ),
+                                                                      ),
+                                                                )
+                                                            : null,
+                                                  ),
+                                                )
+                                                : SizedBox.shrink(),
+                                            SizedBox(height: 10),
+                                            InkWell(
+                                              borderRadius:
+                                                  BorderRadius.circular(30),
+                                              onTap:
+                                                  leadProvider.isLoading
+                                                      ? null
+                                                      : () async {
+                                                        /// ✅ 1. Validate Status (Follow Up)
+                                                        if (leadProvider
+                                                                .selectedCallFollowUpId ==
+                                                            null) {
+                                                          ScaffoldMessenger.of(
+                                                            context,
+                                                          ).showSnackBar(
+                                                            const SnackBar(
+                                                              content: Text(
+                                                                "Please select call status",
+                                                              ),
+                                                              backgroundColor:
+                                                                  Colors
+                                                                      .redAccent,
+                                                            ),
+                                                          );
+                                                          return;
+                                                        }
+
+                                                        /// ✅ 2. Check if Language Required
+                                                        bool
+                                                        isLanguageRequired =
+                                                            leadProvider
+                                                                .selectedCallFollowUpName
+                                                                ?.toLowerCase()
+                                                                .contains(
+                                                                  "language",
+                                                                ) ??
+                                                            false;
+
+                                                        if (isLanguageRequired &&
+                                                            callLogLanguageController
+                                                                .text
+                                                                .isEmpty) {
+                                                          ScaffoldMessenger.of(
+                                                            context,
+                                                          ).showSnackBar(
+                                                            const SnackBar(
+                                                              content: Text(
+                                                                "Please select language",
+                                                              ),
+                                                              backgroundColor:
+                                                                  Colors
+                                                                      .redAccent,
+                                                            ),
+                                                          );
+                                                          return;
+                                                        }
+
+                                                        /// ✅ 3. Optional Note Validation (your existing one)
+                                                        if (callLogNoteController
+                                                            .text
+                                                            .isEmpty) {
+                                                          ScaffoldMessenger.of(
+                                                            context,
+                                                          ).showSnackBar(
+                                                            const SnackBar(
+                                                              content: Text(
+                                                                "Please select status",
+                                                              ),
+                                                              backgroundColor:
+                                                                  Colors
+                                                                      .redAccent,
+                                                            ),
+                                                          );
+                                                          return;
+                                                        }
+
+                                                        /// ✅ API CALL
+                                                        await leadProvider.leadAddcallLogsPro(
+                                                          '',
+                                                          leadProvider
+                                                              .leadIdForCallLog,
+                                                          leadProvider
+                                                              .selectedCallFollowUpId
+                                                              .toString(),
+                                                          leadProvider
+                                                                  .selectedCallLanguageId
+                                                                  ?.toString() ??
+                                                              '',
+                                                        );
+
+                                                        /// ✅ SUCCESS
+                                                        if (leadProvider
+                                                                .success !=
+                                                            null) {
+                                                          leadProvider
+                                                              .callLogFlagPro();
+
+                                                          showSuccessDialog(
+                                                            context,
+                                                            "assets/images/successicons.png",
+                                                            "Success",
+                                                            "${leadProvider.success!.message}",
+                                                          );
+
+                                                          callLogNoteController
+                                                              .text = '';
+                                                          leadProvider
+                                                              .clearSelectdData();
+
+                                                          leadProvider
+                                                              .getLeadPro(
+                                                                '',
+                                                                '',
+                                                                isRefresh: true,
+                                                              );
+                                                        }
+                                                      },
+
+                                              child: Container(
+                                                height: 50,
+                                                alignment: Alignment.center,
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(30),
+                                                  gradient:
+                                                      leadProvider.isLoading
+                                                          ? LinearGradient(
+                                                            colors: [
+                                                              Colors
+                                                                  .grey
+                                                                  .shade400,
+                                                              Colors
+                                                                  .grey
+                                                                  .shade300,
+                                                            ],
+                                                          )
+                                                          : LinearGradient(
+                                                            colors: [
+                                                              Color(0xFF4CAF50),
+                                                              Color(0xFF2E7D32),
+                                                            ], // 👈 green gradient
+                                                          ),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.black
+                                                          .withOpacity(0.1),
+                                                      blurRadius: 6,
+                                                      offset: Offset(0, 3),
+                                                    ),
+                                                  ],
+                                                ),
+                                                child:
+                                                    leadProvider.isLoading
+                                                        ? SizedBox(
+                                                          height: 22,
+                                                          width: 22,
+                                                          child:
+                                                              CircularProgressIndicator(
+                                                                strokeWidth: 2,
+                                                                color:
+                                                                    Colors
+                                                                        .white,
+                                                              ),
+                                                        )
+                                                        : Text(
+                                                          "Submit",
+                                                          style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 16,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
+                                                        ),
                                               ),
                                             ),
                                           ],

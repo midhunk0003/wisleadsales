@@ -6,9 +6,13 @@ import 'package:wisdeals/data/model/business_list_model/business_list_model.dart
 import 'package:wisdeals/data/model/business_name_model/business_name_model.dart';
 
 abstract class BusinessRepository {
-  Future<Either<Failure, List<BusinessName>>> getBusinessName(String? token);
+  Future<Either<Failure, List<BusinessName>>> getBusinessName(
+    String? token,
+    String? search,
+  );
   Future<Either<Failure, BusinessClientNameModel>> getBusinessClientName(
     String? token,
+    String? search,
     String? currentPage,
   );
   Future<Either<Failure, Success>> addBusiness(

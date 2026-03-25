@@ -96,17 +96,15 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
                   orderProvider.failure?.message ?? "No internet connection",
 
               onRetry: () async {
-                // await orderProvider.addLeadPro(
-                //   clientNameController.text.toString(),
-                //   companyNameController.text.toString(),
-                //   phoneNumberController.text.toString(),
-                //   emailController.text.toString(),
-                //   addressController.text.toString(),
-                //   leadSourceController.text.toString(),
-                //   addNoteController.text.toString(),
-                //   leadProvider.leadSelectedIndexName.toString(),
-                //   leadProvider.customerProfileSelectedIndexName.toString(),
-                // );
+                await orderProvider.clientUpdatePro(
+                  widget.clientSingle.id.toString(),
+                  companyNameController.text.toString(),
+                  clientNameController.text.toString(),
+                  phoneNumberController.text.toString(),
+                  emailController.text.toString(),
+                  addressController.text.toString(),
+                  orderProvider.clientSelectedStatusInd.toString(),
+                );
               },
             );
           }
@@ -232,21 +230,21 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
                                         return null;
                                       },
                                     ),
-                                    const SizedBox(height: 20),
-                                    CustomTextFormFieldsWidget(
-                                      isTablet: isTablet,
-                                      title: "Address",
-                                      hintText: "Enter address",
-                                      maxLines: 3,
-                                      controller: addressController,
+                                    // const SizedBox(height: 20),
+                                    // CustomTextFormFieldsWidget(
+                                    //   isTablet: isTablet,
+                                    //   title: "Address",
+                                    //   hintText: "Enter address",
+                                    //   maxLines: 3,
+                                    //   controller: addressController,
 
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Please enter addrsss';
-                                        }
-                                        return null;
-                                      },
-                                    ),
+                                    //   validator: (value) {
+                                    //     if (value == null || value.isEmpty) {
+                                    //       return 'Please enter addrsss';
+                                    //     }
+                                    //     return null;
+                                    //   },
+                                    // ),
                                     const SizedBox(height: 20),
 
                                     /// Lead Status

@@ -17,6 +17,8 @@ class OnboardScreen extends StatefulWidget {
 
 class _OnboardScreenState extends State<OnboardScreen>
     with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<Offset> _slideAnimation;
   Offset cardOffset = Offset.zero;
   double rotation = 0.0;
 
@@ -24,9 +26,14 @@ class _OnboardScreenState extends State<OnboardScreen>
 
   List<String> cards = ["Card 1", "Card 2", "Card 3"];
   bool _showSwipeHint = true;
+
   @override
   void initState() {
     super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
     // Hide hint after 4 seconds
     Future.delayed(const Duration(seconds: 4), () {
       if (mounted) {
@@ -40,32 +47,88 @@ class _OnboardScreenState extends State<OnboardScreen>
   List<Map<String, dynamic>> cardsContent = [
     {
       "text1": "Track",
-      "text2": "Your Sales",
+      "text2": "Your",
+      "text0": "Professional",
       "text3": "Journey",
       "image": "assets/images/dashboardImage1.png",
       "text4": "Easily record travel routes",
-      "text5": "visits, and client meetings",
+      "text5": "visits and client meetings",
       "text6": "in real-time.",
     },
     {
       "text1": "Manage",
       "text2": "Clients",
-      "text3": "&Orders",
+      "text": "",
+      "text3": "And Orders",
       "image": "assets/images/dashboardimage2.png",
       "text4": "Easily add clients,",
-      "text5": "follow up on leads, and",
+      "text5": "follow up on leads and",
       "text6": "organize all orders.",
     },
     {
       "text1": "Track",
       "text2": "Analyse",
+      "text": "",
       "text3": "Grow",
       "image": "assets/images/dashboardimage3.png",
       "text4": "Track expenses",
-      "text5": "performance, and sales",
+      "text5": "performance and sales",
       "text6": "trends to grow faster.",
     },
   ];
+
+  // ------------------ SWIPE LOGIC ------------------
+
+  void onPanUpdate(DragUpdateDetails details) {
+    setState(() {
+      cardOffset += details.delta;
+      rotation = cardOffset.dx / 500;
+    });
+  }
+
+  void onPanEnd(DragEndDetails details) {
+    const threshold = 120;
+
+    if (cardOffset.dx > threshold) {
+      swipeRight();
+    } else if (cardOffset.dx < -threshold) {
+      swipeLeft();
+    } else {
+      resetCard();
+    }
+  }
+
+  void swipeLeft() {
+    animateCard(const Offset(-600, 0), () {
+      if (topCardIndex < cardsContent.length - 1) {
+        topCardIndex++;
+      }
+    });
+  }
+
+  void swipeRight() {
+    animateCard(const Offset(600, 0), () {
+      if (topCardIndex > 0) {
+        topCardIndex--;
+      }
+    });
+  }
+
+  void animateCard(Offset targetOffset, VoidCallback onComplete) {
+    _slideAnimation = Tween(begin: cardOffset, end: targetOffset).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+    )..addListener(() {
+      setState(() {
+        cardOffset = _slideAnimation.value;
+        rotation = cardOffset.dx / 500;
+      });
+    });
+
+    _controller.forward(from: 0).whenComplete(() {
+      onComplete();
+      resetCard();
+    });
+  }
 
   void resetCard() {
     setState(() {
@@ -74,31 +137,10 @@ class _OnboardScreenState extends State<OnboardScreen>
     });
   }
 
-  void swipeCard(DragEndDetails details) {
-    print('cardsssssssssss :${cardsContent.length}');
-    const swipeThreshold = 150;
-
-    if (cardOffset.dx.abs() > swipeThreshold) {
-      setState(() {
-        if (cardOffset.dx < 0) {
-          // Swiped right → move forward
-          if (topCardIndex < cardsContent.length - 1) {
-            topCardIndex += 1;
-          }
-          print("Swiped Right → Next Card");
-        } else {
-          // Swiped left → move backward
-          if (topCardIndex > 0) {
-            topCardIndex -= 1;
-          }
-          print("Swiped Left → Previous Card");
-        }
-        cardOffset = Offset.zero;
-        rotation = 0.0;
-      });
-    } else {
-      resetCard();
-    }
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -107,144 +149,184 @@ class _OnboardScreenState extends State<OnboardScreen>
       body: Container(
         color: Colors.black,
         child: ReusableScafoldAndGlowbackground(
-          child: Consumer<OnboardProvider>(
-            builder: (context, onboardProvider, _) {
-              return Stack(
-                children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final isTablet = constraints.maxWidth >= 600;
+
+              /// Responsive sizes
+              final stackWidth = isTablet ? 420.0 : 300.0;
+              final stackHeight = isTablet ? 560.0 : 440.0;
+              final cardWidth = isTablet ? 360.0 : 260.0;
+              final cardHeight = isTablet ? 480.0 : 400.0;
+              final imageHeight = isTablet ? 200.0 : 140.0;
+              final titleSize = isTablet ? 36.0 : 28.0;
+              final descSize = isTablet ? 18.0 : 16.0;
+              return Consumer<OnboardProvider>(
+                builder: (context, onboardProvider, _) {
+                  return Stack(
                     children: [
-                      SizedBox(
-                        width: 294,
-                        height: 420,
-                        child: Stack(
-                          clipBehavior: Clip.none,
-                          children: List.generate(3, (index) {
-                            int displayIndex =
-                                (topCardIndex +
-                                    index -
-                                    2 +
-                                    cardsContent.length) %
-                                cardsContent.length;
-                            double angle = [-0.4, -0.2, 0.0][index];
-
-                            bool isTopCard = index == 2;
-
-                            return Positioned(
-                              top: index * 10,
-                              left: index * 5,
-                              child:
-                                  isTopCard
-                                      ? GestureDetector(
-                                        onPanUpdate: (details) {
-                                          setState(() {
-                                            cardOffset += details.delta;
-                                            rotation = cardOffset.dx / 300;
-                                          });
-                                        },
-                                        onPanEnd: swipeCard,
-                                        child: Transform.translate(
-                                          offset: cardOffset,
-                                          child: Transform.rotate(
-                                            angle: rotation + angle,
-                                            child: buildCard(displayIndex),
-                                          ),
-                                        ),
-                                      )
-                                      : Transform.rotate(
-                                        angle: angle,
-                                        child: buildCard(displayIndex),
-                                      ),
-                            );
-                          }),
-                        ),
-                      ),
-                      const SizedBox(height: 100),
-                      // Dot indicator
-                      Row(
+                      Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(cardsContent.length, (index) {
-                          return Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 5),
-                            width: 10,
-                            height: 10,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color:
-                                  topCardIndex == index
-                                      ? Colors.blue
-                                      : Colors.white,
-                            ),
-                          );
-                        }),
-                      ),
-                      const SizedBox(height: 60),
-                      // Next button
-                      if (topCardIndex == cardsContent.length - 1)
-                        ElevatedButton(
-                          onPressed: () async {
-                            print("Next button pressed!");
-                            // Navigate to next screen
-                            Navigator.pushReplacementNamed(
-                              context,
-                              '/loginScreen',
-                            );
-                            await onboardProvider.completeOnboarding();
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: kbuttonColor1,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 50,
-                              vertical: 15,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
+                        children: [
+                          SizedBox(
+                            width: stackWidth,
+                            height: stackHeight,
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              children: List.generate(3, (index) {
+                                int displayIndex =
+                                    (topCardIndex +
+                                        index -
+                                        2 +
+                                        cardsContent.length) %
+                                    cardsContent.length;
+                                double angle = [-0.4, -0.2, 0.0][index];
+
+                                bool isTopCard = index == 2;
+                                double scale =
+                                    isTopCard ? 1 : 0.9 + (index * 0.05);
+                                double opacity =
+                                    isTopCard ? 1 : 0.6 + (index * 0.2);
+                                return Positioned(
+                                  top: index * 12,
+                                  left: index * 6,
+                                  child:
+                                      isTopCard
+                                          ? GestureDetector(
+                                            onPanUpdate: onPanUpdate,
+                                            onPanEnd: onPanEnd,
+                                            child: Transform.translate(
+                                              offset: cardOffset,
+                                              child: Transform.rotate(
+                                                angle: rotation + angle,
+                                                child: Opacity(
+                                                  opacity: opacity,
+                                                  child: Transform.scale(
+                                                    scale: scale,
+                                                    child: buildCard(
+                                                      displayIndex,
+                                                      cardWidth,
+                                                      cardHeight,
+                                                      imageHeight,
+                                                      titleSize,
+                                                      descSize,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          )
+                                          : Transform.rotate(
+                                            angle: angle,
+                                            child: Opacity(
+                                              opacity: opacity,
+                                              child: Transform.scale(
+                                                scale: scale,
+                                                child: buildCard(
+                                                  displayIndex,
+                                                  cardWidth,
+                                                  cardHeight,
+                                                  imageHeight,
+                                                  titleSize,
+                                                  descSize,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                );
+                              }),
                             ),
                           ),
-                          child: Icon(Icons.arrow_forward_ios),
-                        ),
-                    ],
-                  ),
-                  _showSwipeHint
-                      ? AnimatedOpacity(
-                        opacity: _showSwipeHint ? 1.0 : 0.0,
-                        duration: const Duration(seconds: 1),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: const Color.fromARGB(
-                              255,
-                              228,
-                              228,
-                              228,
-                            ).withOpacity(0.5),
-                          ),
-                          child: Column(
+                          SizedBox(height: isTablet ? 100 : 80),
+                          // Dot indicator
+
+                          // DOTS
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Center(
-                                child: Lottie.asset(
-                                  'assets/json/swipeleft.json',
-                                  width: 150,
-                                  height: 150,
-                                  repeat: true,
-                                  animate: true,
+                            children: List.generate(
+                              cardsContent.length,
+                              (index) => AnimatedContainer(
+                                duration: const Duration(milliseconds: 300),
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 5,
+                                ),
+                                width: topCardIndex == index ? 18 : 8,
+                                height: 8,
+                                decoration: BoxDecoration(
+                                  color:
+                                      topCardIndex == index
+                                          ? Colors.blue
+                                          : Colors.white,
+                                  borderRadius: BorderRadius.circular(20),
                                 ),
                               ),
-                              const SizedBox(height: 5),
-                              const Text(
-                                'Swipe left to continue',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
-                        ),
-                      )
-                      : SizedBox.shrink(),
-                ],
+                          SizedBox(height: isTablet ? 70 : 50),
+
+                          // Next button
+                          if (topCardIndex == cardsContent.length - 1)
+                            ElevatedButton(
+                              onPressed: () async {
+                                print("Next button pressed!");
+                                // Navigate to next screen
+                                Navigator.pushReplacementNamed(
+                                  context,
+                                  '/loginScreen',
+                                );
+                                await onboardProvider.completeOnboarding();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: kbuttonColor1,
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: isTablet ? 70 : 50,
+                                  vertical: isTablet ? 20 : 15,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                              ),
+                              child: Icon(Icons.arrow_forward_ios),
+                            ),
+                        ],
+                      ),
+                      _showSwipeHint
+                          ? AnimatedOpacity(
+                            opacity: _showSwipeHint ? 1 : 0,
+                            duration: const Duration(seconds: 1),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.5),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Center(
+                                    child: Lottie.asset(
+                                      'assets/json/swipeleft.json',
+                                      width: isTablet ? 220 : 150,
+                                      height: isTablet ? 220 : 150,
+                                      repeat: true,
+                                      animate: true,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 5),
+                                  Text(
+                                    'Swipe left to continue',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: isTablet ? 20 : 16,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                          : SizedBox.shrink(),
+                    ],
+                  );
+                },
               );
             },
           ),
@@ -252,8 +334,17 @@ class _OnboardScreenState extends State<OnboardScreen>
       ),
     );
   }
+  // ------------------ CARD UI ------------------
 
-  Widget buildCard(int index) {
+  Widget buildCard(
+    int index,
+    double width,
+    double height,
+    double imageHeight,
+    double titleSize,
+    double descSize,
+  ) {
+    final data = cardsContent[index];
     return Padding(
       padding: const EdgeInsets.only(left: 20, right: 20),
       child: ClipRRect(
@@ -261,8 +352,8 @@ class _OnboardScreenState extends State<OnboardScreen>
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
           child: Container(
-            // width: ,
-            height: 400,
+            width: width,
+            height: height,
             decoration: BoxDecoration(
               color: Colors.amber,
               gradient: LinearGradient(
@@ -280,102 +371,102 @@ class _OnboardScreenState extends State<OnboardScreen>
               ),
             ),
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+              padding: const EdgeInsets.all(20),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Container(
-                    child: Column(
-                      children: [
-                        RichText(
-                          textAlign: TextAlign.center,
-                          text: TextSpan(
-                            children: [
-                              TextSpan(
-                                text: "${cardsContent[index]['text1']}",
-                                style: const TextStyle(
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.bold,
-                                  color: kTextColorPrimary,
-                                ),
+                  Column(
+                    children: [
+                      RichText(
+                        textAlign: TextAlign.center,
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: "${cardsContent[index]['text1']}",
+                              style: const TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                                color: kTextColorPrimary,
                               ),
-                              WidgetSpan(
-                                child: SizedBox(
-                                  width: 8,
-                                ), // space between words
+                            ),
+                            WidgetSpan(
+                              child: SizedBox(width: 8), // space between words
+                            ),
+                            TextSpan(
+                              text: "${cardsContent[index]['text2']}",
+                              style: TextStyle(
+                                fontSize: titleSize,
+                                fontWeight: FontWeight.bold,
+                                color: kTextColorSecondary,
                               ),
-                              TextSpan(
-                                text: "${cardsContent[index]['text2']}",
-                                style: const TextStyle(
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.bold,
-                                  color: kTextColorSecondary,
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                        Text(
-                          "${cardsContent[index]['text3']}",
-                          style: const TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.bold,
-                            color: kTextColorPrimary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  Container(
-                    width: 130,
-                    height: 140,
-                    decoration: BoxDecoration(
-                      // color: Colors.blueAccent,
-                      image: DecorationImage(
-                        image: AssetImage('${cardsContent[index]['image']}'),
-                        fit: BoxFit.cover,
                       ),
-                    ),
-                  ),
-
-                  Container(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        RichText(
-                          textAlign: TextAlign.start,
-                          text: TextSpan(
-                            children: [
-                              TextSpan(
-                                text: "${cardsContent[index]['text4']}",
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: kTextColorSecondary,
-                                ),
+                      RichText(
+                        textAlign: TextAlign.center,
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: "${cardsContent[index]['text0'] ?? ''}",
+                              style: TextStyle(
+                                fontSize: titleSize,
+                                fontWeight: FontWeight.bold,
+                                color: kTextColorSecondary,
                               ),
-                            ],
-                          ),
+                            ),
+                            WidgetSpan(
+                              child: SizedBox(width: 8), // space between words
+                            ),
+                            TextSpan(
+                              text: "${cardsContent[index]['text3']}",
+                              style: TextStyle(
+                                fontSize: titleSize,
+                                fontWeight: FontWeight.bold,
+                                color: kTextColorPrimary,
+                              ),
+                            ),
+                          ],
                         ),
-                        Text(
-                          "${cardsContent[index]['text5']}",
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: kTextColorPrimary,
-                          ),
+                      ),
+                    ],
+                  ),
+                  Image.asset(data['image'], height: imageHeight),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      RichText(
+                        textAlign: TextAlign.start,
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: "${cardsContent[index]['text4']}",
+                              style: TextStyle(
+                                fontSize: descSize,
+                                fontWeight: FontWeight.bold,
+                                color: kTextColorSecondary,
+                              ),
+                            ),
+                          ],
                         ),
-                        Text(
-                          "${cardsContent[index]['text6']}",
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: kTextColorPrimary,
-                          ),
+                      ),
+                      Text(
+                        "${cardsContent[index]['text5']}",
+                        style: TextStyle(
+                          fontSize: descSize,
+                          fontWeight: FontWeight.bold,
+                          color: kTextColorPrimary,
                         ),
-                      ],
-                    ),
+                      ),
+                      Text(
+                        "${cardsContent[index]['text6']}",
+                        style: TextStyle(
+                          fontSize: descSize,
+                          fontWeight: FontWeight.bold,
+                          color: kTextColorPrimary,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

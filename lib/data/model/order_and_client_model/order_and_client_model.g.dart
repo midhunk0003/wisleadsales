@@ -13,11 +13,16 @@ OrderAndClientModel _$OrderAndClientModelFromJson(Map<String, dynamic> json) =>
           (json['data'] as List<dynamic>?)
               ?.map((e) => Clients.fromJson(e as Map<String, dynamic>))
               .toList(),
+      total: (json['total'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$OrderAndClientModelToJson(
   OrderAndClientModel instance,
-) => <String, dynamic>{'success': instance.success, 'data': instance.data};
+) => <String, dynamic>{
+  'success': instance.success,
+  'data': instance.data,
+  'total': instance.total,
+};
 
 Clients _$ClientsFromJson(Map<String, dynamic> json) => Clients(
   id: (json['id'] as num?)?.toInt(),

@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wisdeals/core/failure.dart';
 import 'package:wisdeals/core/success.dart';
+import 'package:wisdeals/data/model/call_follow_up_languages/call_follow_up_languages.dart';
+import 'package:wisdeals/data/model/call_follow_up_note_model/call_follow_up_note_model.dart';
 import 'package:wisdeals/data/model/order_and_client_model/order_and_client_model.dart';
 import 'package:wisdeals/domain/repository/order_and_client_repository.dart';
 import 'package:wisdeals/services/auth_services.dart';
@@ -17,6 +19,7 @@ class OrderProvider extends ChangeNotifier {
   bool _isLoading = false;
   bool _isLoadingDelete = false;
   bool _isLoadingAddMeeting = false;
+  bool _isLoadingCallNotes = false;
   bool _showMeetings = false;
   Failure? _failure;
   Success? _success;
@@ -38,6 +41,8 @@ class OrderProvider extends ChangeNotifier {
   String? _selectedTimeFrom;
   String? _selectedTimeTo;
 
+  String? _totalCount;
+
   final now = DateTime.now();
   Meeting? _firstPastMeeting;
   Meeting? _firstUpcomingMeeting;
@@ -56,10 +61,19 @@ class OrderProvider extends ChangeNotifier {
   bool _hasMore = true;
   bool _isLoadingMore = false;
 
+  String? _selectedCallFollowUp;
+  bool _hideAndShowCallFollowUpForSelect = false;
+  String? _selectedCallFollowUpId;
+  String? _selectedCallFollowUpName;
+  String? _selectedCallLanguageId;
+  String? _selectedCallLanguageName;
+  bool _hideAndShowCallLanguage = false;
+
   // getter
   bool get isLoading => _isLoading;
   bool get isLoadingDelete => _isLoadingDelete;
   bool get isLoadingAddMeeting => _isLoadingAddMeeting;
+  bool get isLoadingCallNotes => _isLoadingCallNotes;
   bool get showMeetings => _showMeetings;
   Failure? get failure => _failure;
   Success? get success => _success;
@@ -106,8 +120,59 @@ class OrderProvider extends ChangeNotifier {
   int get currentPage => _currentPage;
   bool get hasMore => _hasMore;
   bool get isLoadingMore => _isLoadingMore;
+  String? get totalCount => _totalCount;
+
+  String? get selectedCallFollowUp => _selectedCallFollowUp;
+  bool get hideAndShowCallFollowUpForSelect =>
+      _hideAndShowCallFollowUpForSelect;
+  String? get selectedCallFollowUpId => _selectedCallFollowUpId;
+  String? get selectedCallFollowUpName => _selectedCallFollowUpName;
+  bool get hideAndShowCallLanguage => _hideAndShowCallLanguage;
+  String? get selectedCallLanguageId => _selectedCallLanguageId;
+  String? get selectedCallLanguageName => _selectedCallLanguageName;
+
+  List<CallNote>? _getClientCallNotes;
+  List<CallNote>? get getClientCallNotes => _getClientCallNotes;
+
+  List<CallLanguage>? _getClientCallLanguage;
+  List<CallLanguage>? get getClientCallLanguage => _getClientCallLanguage;
 
   //call logs
+
+  void hideAndShowCallFollowUpForSelectPro() {
+    _hideAndShowCallFollowUpForSelect = !_hideAndShowCallFollowUpForSelect;
+    notifyListeners();
+  }
+
+  void hideAndShowCallLanguagePro() {
+    _hideAndShowCallLanguage = !_hideAndShowCallLanguage;
+    notifyListeners();
+  }
+
+  void selectCallFolowUp(
+    String? selectCallFolowUpId,
+    String? selectCallFolowUpTitle,
+  ) {
+    _selectedCallFollowUpId = selectCallFolowUpId;
+    _selectedCallFollowUpName = selectCallFolowUpTitle;
+    notifyListeners();
+  }
+
+  void selectCallLanguagePro(
+    String? selectCallLanguageIds,
+    String? selectCallLanguageTitles,
+  ) {
+    _selectedCallLanguageId = selectCallLanguageIds;
+    _selectedCallLanguageName = selectCallLanguageTitles;
+    notifyListeners();
+  }
+
+  void clearWhenLanguageNotselected() {
+    print('clear when select not language');
+    _selectedCallLanguageId = '';
+    _selectedCallLanguageName = '';
+    notifyListeners();
+  }
 
   void callLogFlagPro() {
     _callLogFlag = !_callLogFlag;
@@ -121,6 +186,15 @@ class OrderProvider extends ChangeNotifier {
 
   void showCallLogListHideAndShow() {
     _showHideCallLogs = !_showHideCallLogs;
+    notifyListeners();
+  }
+
+  void clearSelectdData() {
+    print('clear failure called');
+    _selectedCallFollowUpId = '';
+    _selectedCallFollowUpName = '';
+    _selectedCallLanguageId = '';
+    _selectedCallLanguageName = '';
     notifyListeners();
   }
 
@@ -375,7 +449,8 @@ class OrderProvider extends ChangeNotifier {
         notifyListeners();
       },
       (success) {
-        final fetchedList = success ?? [];
+        _totalCount = success.total.toString();
+        final fetchedList = success.data ?? [];
         if (isRefresh == true) {
           print('initial content :  and current page:${_currentPage}');
           // First page → replace list
@@ -554,7 +629,8 @@ class OrderProvider extends ChangeNotifier {
   Future<void> clientAddcallLogsPro(
     String? clientId,
     String? leadId,
-    String? callNote,
+    String? notesId,
+    String? languageId,
   ) async {
     _isLoading = true;
     _success = null;
@@ -567,7 +643,8 @@ class OrderProvider extends ChangeNotifier {
       token,
       clientId,
       '',
-      callNote,
+      notesId,
+      languageId,
     );
     result.fold(
       (failure) async {
@@ -646,6 +723,60 @@ class OrderProvider extends ChangeNotifier {
       (success) {
         _success = success;
         _isLoadingDelete = false;
+        notifyListeners();
+      },
+    );
+  }
+
+  Future<void> getOrderCallNotePro() async {
+    _isLoadingCallNotes = true;
+    _failure = null;
+    notifyListeners();
+    final SharedPreferences pref = await SharedPreferences.getInstance();
+    String? token = pref.getString('token');
+    print('inside lead call note pro : token ${token}');
+    final result = await orderAndClientRepository.getOrderCallNote(token);
+
+    result.fold(
+      (failure) async {
+        if (failure is AuthFailure) {
+          print('vvvvvvvvvvvvvvvvvvvv...${failure.message}');
+          await AuthService.forceLogout();
+        }
+        _isLoadingCallNotes = false;
+        _failure = failure;
+        notifyListeners();
+      },
+      (success) {
+        _getClientCallNotes = success;
+        _isLoadingCallNotes = false;
+        notifyListeners();
+      },
+    );
+  }
+
+  Future<void> getOrderCallLanguagePro() async {
+    _isLoadingCallNotes = true;
+    _failure = null;
+    notifyListeners();
+    final SharedPreferences pref = await SharedPreferences.getInstance();
+    String? token = pref.getString('token');
+    print('inside lead call note pro : token ${token}');
+    final result = await orderAndClientRepository.getOrderCallLAnguage(token);
+
+    result.fold(
+      (failure) async {
+        if (failure is AuthFailure) {
+          print('vvvvvvvvvvvvvvvvvvvv...${failure.message}');
+          await AuthService.forceLogout();
+        }
+        _isLoadingCallNotes = false;
+        _failure = failure;
+        notifyListeners();
+      },
+      (success) {
+        _getClientCallLanguage = success;
+        _isLoadingCallNotes = false;
         notifyListeners();
       },
     );

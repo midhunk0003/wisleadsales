@@ -98,7 +98,8 @@ CollectedPaymentsList _$CollectedPaymentsListFromJson(
 ) => CollectedPaymentsList(
   id: _stringFromDynamic(json['id']),
   amount: _stringFromDynamic(json['amount']),
-)..collecteDate = _stringFromDynamic(json['collected_date']);
+  collecteDate: _stringFromDynamic(json['collected_date']),
+);
 
 Map<String, dynamic> _$CollectedPaymentsListToJson(
   CollectedPaymentsList instance,

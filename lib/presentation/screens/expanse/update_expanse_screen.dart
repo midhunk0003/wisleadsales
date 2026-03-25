@@ -101,7 +101,20 @@ class _UpdateExpanseScreenState extends State<UpdateExpanseScreen> {
                         expanseProvider.failure?.message ??
                         "No internet connection",
 
-                    onRetry: () async {},
+                    onRetry: () async {
+                      await expanseProvider.updateExpanseData(
+                        widget.expanse!.id.toString(),
+                        clientNameController.text.toString(),
+                        companyNameController.text.toString(),
+                        expanseProvider.expanseSelectedValue.toString(),
+                        amountController.text.toString(),
+                        expanseProvider.paymentSelectedValue.toString(),
+                        expanseProvider.selectedFile == null
+                            ? expanseProvider.netWorkImage
+                            : expanseProvider.selectedFile.toString(),
+                        noteController.text.toString(),
+                      );
+                    },
                   );
                 }
                 return Stack(

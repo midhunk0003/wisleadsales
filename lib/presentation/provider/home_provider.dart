@@ -114,6 +114,7 @@ class HomeProvider extends ChangeNotifier {
         (success) {
           _setLoading(false);
           _homeData = success;
+
           // You can derive hasClockin from API data if needed
           _hasClockin = success.status == true;
           if (_hasClockin) {
@@ -173,7 +174,7 @@ class HomeProvider extends ChangeNotifier {
 
   void _startSendLocationTimer() {
     _sendLocationTimer?.cancel();
-    _sendLocationTimer = Timer.periodic(const Duration(minutes: 30), (_) {
+    _sendLocationTimer = Timer.periodic(const Duration(minutes: 5), (_) {
       if (currentPosition != null) {
         sendLatitudeAndLongPro(
           currentPosition!.latitude.toString(),
@@ -668,29 +669,193 @@ class HomeProvider extends ChangeNotifier {
     return true;
   }
 
+  // // ----------------- LIVE LOCATION TRACKING -----------------
+  // Future<void> _startTracking() async {
+  //   // Avoid multiple subscriptions
+  //   userPositionStream?.cancel();
+  //   // Load previous saved distance first from shared prefence
+
+  //   await _getTrackingData(); // This must run BEFORE stream listens
+
+  //   totalDistance = totalDistancePrefData; // Continue from last saved value
+  //   print("STARTING DISTANCE : $totalDistance");
+
+  //   notifyListeners();
+  //   const LocationSettings settings = LocationSettings(
+  //     accuracy: LocationAccuracy.high,
+  //     distanceFilter: 10,
+  //   );
+  //   _startSendLocationTimer(); // ✅ START API TIMER
+  //   userPositionStream = Geolocator.getPositionStream(
+  //     locationSettings: settings,
+  //   ).listen((position) async {
+  //     final newLatLng = LatLng(position.latitude, position.longitude);
+
+  //     // Distance calculation
+  //     if (lastPosition != null) {
+  //       final distance = Geolocator.distanceBetween(
+  //         lastPosition!.latitude,
+  //         lastPosition!.longitude,
+  //         newLatLng.latitude,
+  //         newLatLng.longitude,
+  //       );
+  //       totalDistance += distance;
+  //     }
+
+  //     lastPosition = newLatLng;
+  //     currentPosition = newLatLng;
+  //     print('123333333333333333');
+
+  //     // Store values every update
+  //     await _saveTrackingData();
+  //     await _getTrackingData();
+
+  //     // Update marker
+  //     markers = {
+  //       Marker(
+  //         markerId: const MarkerId("CurrentLocation"),
+  //         position: newLatLng,
+  //         infoWindow: const InfoWindow(title: "You are here"),
+  //         icon: BitmapDescriptor.defaultMarkerWithHue(
+  //           BitmapDescriptor.hueAzure,
+  //         ),
+  //       ),
+  //     };
+
+  //     // Move camera if map is attached
+  //     if (mapController != null) {
+  //       mapController!.animateCamera(CameraUpdate.newLatLng(newLatLng));
+  //     }
+
+  //     print('123');
+
+  //     notifyListeners();
+  //   });
+  // }
+
+  // // ----------------- LIVE LOCATION TRACKING -----------------
+  // Future<void> _startTracking() async {
+  //   // Avoid multiple subscriptions
+  //   userPositionStream?.cancel();
+  //   // Load previous saved distance first from shared prefence
+
+  //   await _getTrackingData(); // This must run BEFORE stream listens
+
+  //   totalDistance = totalDistancePrefData; // Continue from last saved value
+  //   print("STARTING DISTANCE : $totalDistance");
+
+  //   notifyListeners();
+  //   const LocationSettings settings = LocationSettings(
+  //     accuracy: LocationAccuracy.high,
+  //     distanceFilter: 30,
+  //   );
+  //   _startSendLocationTimer(); // ✅ START API TIMER
+  //   userPositionStream = Geolocator.getPositionStream(
+  //     locationSettings: settings,
+  //   ).listen((position) async {
+  //     final newLatLng = LatLng(position.latitude, position.longitude);
+
+  //     // Distance calculation
+  //     if (lastPosition != null) {
+  //       final distance = Geolocator.distanceBetween(
+  //         lastPosition!.latitude,
+  //         lastPosition!.longitude,
+  //         newLatLng.latitude,
+  //         newLatLng.longitude,
+  //       );
+  //       totalDistance += distance;
+  //     }
+
+  //     lastPosition = newLatLng;
+  //     currentPosition = newLatLng;
+  //     print('123333333333333333');
+
+  //     // Store values every update
+  //     await _saveTrackingData();
+  //     await _getTrackingData();
+
+  //     // Update marker
+  //     markers = {
+  //       Marker(
+  //         markerId: const MarkerId("CurrentLocation"),
+  //         position: newLatLng,
+  //         infoWindow: const InfoWindow(title: "You are here"),
+  //         icon: BitmapDescriptor.defaultMarkerWithHue(
+  //           BitmapDescriptor.hueAzure,
+  //         ),
+  //       ),
+  //     };
+
+  //     // Move camera if map is attached
+  //     if (mapController != null) {
+  //       mapController!.animateCamera(CameraUpdate.newLatLng(newLatLng));
+  //     }
+
+  //     print('123');
+
+  //     notifyListeners();
+  //   });
+  // }
+
+  // Future<void> stopLocationTracking() async {
+  //   final prefs = await SharedPreferences.getInstance();
+
+  //   await prefs.remove('totalDistance');
+  //   await prefs.remove('currentLatitude');
+  //   await prefs.remove('currentLongitude');
+
+  //   // reset provider variables
+  //   totalDistance = 0.0;
+  //   currentPosition = null;
+  //   _currentPositionPrefData = null;
+  //   lastPosition = null;
+
+  //   // stop stream
+  //   await userPositionStream?.cancel();
+  //   _sendLocationTimer?.cancel();
+  //   userPositionStream = null;
+
+  //   _getTrackingData();
+
+  //   notifyListeners();
+  // }
+
   // ----------------- LIVE LOCATION TRACKING -----------------
+  DateTime? _lastPositionTime;
+
   Future<void> _startTracking() async {
-    // Avoid multiple subscriptions
     userPositionStream?.cancel();
-    // Load previous saved distance first from shared prefence
 
-    await _getTrackingData(); // This must run BEFORE stream listens
-
-    totalDistance = totalDistancePrefData; // Continue from last saved value
-    print("STARTING DISTANCE : $totalDistance");
-
+    await _getTrackingData();
+    totalDistance = totalDistancePrefData;
+    _lastPositionTime = null;
+    debugPrint("STARTING DISTANCE : $totalDistance");
     notifyListeners();
+
+    // ✅ distanceFilter: 30 — OS won't fire callback unless device moved 30m.
+    // This is the #1 fix for idle GPS drift. Handled at chip level, zero CPU cost.
     const LocationSettings settings = LocationSettings(
       accuracy: LocationAccuracy.high,
-      distanceFilter: 1,
+      distanceFilter: 30,
     );
-    _startSendLocationTimer(); // ✅ START API TIMER
+
+    _startSendLocationTimer();
+
     userPositionStream = Geolocator.getPositionStream(
       locationSettings: settings,
     ).listen((position) async {
-      final newLatLng = LatLng(position.latitude, position.longitude);
+      // ✅ FILTER 1: Skip poor GPS signal
+      // 25m threshold handles urban canyons, tunnels, underground parking
+      if (position.accuracy > 25.0) {
+        debugPrint(
+          'Skipped: poor accuracy ${position.accuracy.toStringAsFixed(0)}m',
+        );
+        return;
+      }
 
-      // Distance calculation
+      final newLatLng = LatLng(position.latitude, position.longitude);
+      final now = DateTime.now();
+
       if (lastPosition != null) {
         final distance = Geolocator.distanceBetween(
           lastPosition!.latitude,
@@ -698,18 +863,44 @@ class HomeProvider extends ChangeNotifier {
           newLatLng.latitude,
           newLatLng.longitude,
         );
+
+        // ✅ FILTER 2: Skip tiny movements (parked at client, waiting at traffic light)
+        // 30m mirrors the distanceFilter as a safety net
+        if (distance < 30.0) {
+          debugPrint('Skipped: too small ${distance.toStringAsFixed(0)}m');
+          return;
+        }
+
+        // ✅ FILTER 3: Skip GPS teleport / satellite error
+        // 55 m/s = 200 km/h — allows highway driving, blocks impossible jumps
+        if (_lastPositionTime != null) {
+          final seconds =
+              now.difference(_lastPositionTime!).inMilliseconds / 1000.0;
+          if (seconds > 0) {
+            final speed = distance / seconds;
+            if (speed > 55.0) {
+              debugPrint(
+                'Skipped: impossible speed ${(speed * 3.6).toStringAsFixed(0)} km/h',
+              );
+              return;
+            }
+          }
+        }
+
+        // ✅ All filters passed — real driving movement
         totalDistance += distance;
+        debugPrint(
+          'Added ${distance.toStringAsFixed(0)}m | Total: ${(totalDistance / 1000).toStringAsFixed(3)} km',
+        );
       }
 
       lastPosition = newLatLng;
       currentPosition = newLatLng;
-      print('123333333333333333');
+      _lastPositionTime = now;
 
-      // Store values every update
       await _saveTrackingData();
       await _getTrackingData();
 
-      // Update marker
       markers = {
         Marker(
           markerId: const MarkerId("CurrentLocation"),
@@ -721,12 +912,9 @@ class HomeProvider extends ChangeNotifier {
         ),
       };
 
-      // Move camera if map is attached
       if (mapController != null) {
         mapController!.animateCamera(CameraUpdate.newLatLng(newLatLng));
       }
-
-      print('123');
 
       notifyListeners();
     });
@@ -739,18 +927,17 @@ class HomeProvider extends ChangeNotifier {
     await prefs.remove('currentLatitude');
     await prefs.remove('currentLongitude');
 
-    // reset provider variables
     totalDistance = 0.0;
     currentPosition = null;
     _currentPositionPrefData = null;
     lastPosition = null;
+    _lastPositionTime = null; // ✅ reset time tracker too
 
-    // stop stream
     await userPositionStream?.cancel();
     _sendLocationTimer?.cancel();
     userPositionStream = null;
 
-    _getTrackingData();
+    await _getTrackingData();
 
     notifyListeners();
   }

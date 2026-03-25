@@ -95,7 +95,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 child: Column(
                                   children: [
                                     Text(
-                                      'WISLEAD',
+                                      'Wteams',
                                       style: TextStyle(
                                         color: kTextColorPrimary,
                                         fontWeight: FontWeight.bold,

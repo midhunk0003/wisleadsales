@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wisdeals/core/failure.dart';
 import 'package:wisdeals/core/success.dart';
@@ -27,6 +28,8 @@ class BusinessProvider extends ChangeNotifier {
   List<BusinessName>? _businessNamesList;
   List<Map<String, dynamic>>? _filterStringDatas;
   String? _getFilterSelectedIndexName;
+  bool _showMonthInMainScreen = false;
+  bool _showyearInMainScreen = false;
 
   // business name and id
   String? _selectedBusinessName;
@@ -73,6 +76,12 @@ class BusinessProvider extends ChangeNotifier {
   BusinessData? _businessSingleObjectData;
   List<BusinessListData>? _businessAllListData;
 
+  int? _loadingIndex; // which item loading
+  int? get loadingIndex => _loadingIndex;
+
+  List<BusinessListData> _businessListLocal = [];
+  List<BusinessListData> get businessListLocal => _businessListLocal;
+
   // getter
   bool get isLoading => _isLoading;
   bool get isLoadingDelete => _isLoadingDelete;
@@ -89,7 +98,8 @@ class BusinessProvider extends ChangeNotifier {
   List<BusinessName>? get businessNamesList => _businessNamesList;
   List<Map<String, dynamic>>? get filterStringDatas => _filterStringDatas;
   String? get getFilterSelectedIndexName => _getFilterSelectedIndexName;
-
+  bool get showMonthInMainScreen => _showMonthInMainScreen;
+  bool get showyearInMainScreen => _showyearInMainScreen;
   // business name and id
   String? get selectedBusinessName => _selectedBusinessName;
   String? get selecttedbusinessId => _selecttedbusinessId;
@@ -110,6 +120,22 @@ class BusinessProvider extends ChangeNotifier {
   // business list
   BusinessData? get businessSingleObjectData => _businessSingleObjectData;
   List<BusinessListData>? get businessAllListData => _businessAllListData;
+
+  void showMonthMainScreenPro() {
+    _showMonthInMainScreen = !_showMonthInMainScreen;
+    notifyListeners();
+  }
+
+  void showYearMainScreenPro() {
+    _showyearInMainScreen = !_showyearInMainScreen;
+    notifyListeners();
+  }
+
+  void hideAll() {
+    _showMonthInMainScreen = false;
+    _showyearInMainScreen = false;
+    notifyListeners();
+  }
 
   /// Get Current Month Name
   static String _currentMonth() {
@@ -366,7 +392,10 @@ class BusinessProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> getBusinessClientNamePro({bool isRefresh = false}) async {
+  Future<void> getBusinessClientNamePro(
+    String? search, {
+    bool isRefresh = false,
+  }) async {
     print('is refresh............ :  ${isRefresh}');
     if (isRefresh) {
       _isLoading = true;
@@ -388,6 +417,7 @@ class BusinessProvider extends ChangeNotifier {
 
     final result = await businessRepository.getBusinessClientName(
       token,
+      search,
       _limit.toString(),
     );
 
@@ -416,7 +446,7 @@ class BusinessProvider extends ChangeNotifier {
     );
   }
 
-  Future<void> getBusinessNamePro() async {
+  Future<void> getBusinessNamePro(String? search) async {
     _isLoading = true;
     _success = null;
     _failure = null;
@@ -424,7 +454,7 @@ class BusinessProvider extends ChangeNotifier {
     final SharedPreferences pref = await SharedPreferences.getInstance();
     String? token = pref.getString('token');
 
-    final result = await businessRepository.getBusinessName(token);
+    final result = await businessRepository.getBusinessName(token, search);
     result.fold(
       (failure) async {
         if (failure is AuthFailure) {
@@ -545,10 +575,15 @@ class BusinessProvider extends ChangeNotifier {
     );
   }
 
-  Future<void> addAmountPro(String? businessId, String? collectedAmount) async {
-    _isLoading = true;
+  Future<void> addAmountPro(
+    String? businessId,
+    String? collectedAmount,
+    int index,
+  ) async {
+    // _isLoading = true;
     _success = null;
     _failure = null;
+    _loadingIndex = index;
     notifyListeners();
     print('aaaaaaaaaaa : ${businessId}');
     print('bbbbbbbbbbb :${collectedAmount}');
@@ -566,15 +601,52 @@ class BusinessProvider extends ChangeNotifier {
           print('vvvvvvvvvvvvvvvvvvvv...${failure.message}');
           await AuthService.forceLogout();
         }
-        _isLoading = false;
+        // _isLoading = false;
+        _loadingIndex = null; // stop loader
         _failure = failure;
         notifyListeners();
       },
       (success) {
         _success = success;
-        _isLoading = false;
+
+        /// 🔥 Update only that business locally
+        _updateCollectedAmount(index, collectedAmount);
+        // _isLoading = false;
+        _loadingIndex = null; // stop loader
         notifyListeners();
       },
+    );
+  }
+
+  void _updateCollectedAmount(int index, String? amount) {
+    if (amount == null) return;
+
+    final business = businessAllListData![index];
+
+    double collected =
+        double.tryParse(business.collectedBusinessCost ?? "0") ?? 0;
+
+    double added = double.tryParse(amount) ?? 0;
+
+    business.collectedBusinessCost = (collected + added).toStringAsFixed(2);
+
+    double pending =
+        double.tryParse(business.pendingCollection.toString()) ?? 0;
+
+    business.pendingCollection = (pending - added).toStringAsFixed(2);
+
+    /// ---------- 3️⃣ Update Payment List ----------
+    business.collectedPayments ??= [];
+
+    business.collectedPayments!.insert(
+      0,
+      CollectedPaymentsList(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        amount: amount,
+
+        /// ✅ same format as API
+        collecteDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
+      ),
     );
   }
 

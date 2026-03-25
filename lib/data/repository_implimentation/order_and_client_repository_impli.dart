@@ -6,12 +6,14 @@ import 'package:http/http.dart' as http;
 import 'package:wisdeals/core/api_end_point.dart';
 import 'package:wisdeals/core/failure.dart';
 import 'package:wisdeals/core/success.dart';
+import 'package:wisdeals/data/model/call_follow_up_languages/call_follow_up_languages.dart';
+import 'package:wisdeals/data/model/call_follow_up_note_model/call_follow_up_note_model.dart';
 import 'package:wisdeals/data/model/order_and_client_model/order_and_client_model.dart';
 import 'package:wisdeals/domain/repository/order_and_client_repository.dart';
 
 class OrderAndClientRepositoryImpli implements OrderAndClientRepository {
   @override
-  Future<Either<Failure, List<Clients>>> getClients(
+  Future<Either<Failure, OrderAndClientModel>> getClients(
     String? token,
     String? search,
     String? page,
@@ -35,8 +37,12 @@ class OrderAndClientRepositoryImpli implements OrderAndClientRepository {
       log("clients list  : ${response.body}");
 
       if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body)['data'];
-        final clientsList = data.map((e) => Clients.fromJson(e)).toList();
+        // final List<dynamic> data = json.decode(response.body)['data'];
+        // final clientsList = data.map((e) => Clients.fromJson(e)).toList();
+        // print('clients list inside : ${clientsList}');
+        // return Right(clientsList);
+        final dynamic data = json.decode(response.body);
+        final clientsList = OrderAndClientModel.fromJson(data);
         print('clients list inside : ${clientsList}');
         return Right(clientsList);
       }
@@ -237,7 +243,8 @@ class OrderAndClientRepositoryImpli implements OrderAndClientRepository {
     String? token,
     String? clientId,
     String? leadId,
-    String? note,
+    String? noteId,
+    String? languageId,
   ) async {
     final client = http.Client();
     try {
@@ -250,7 +257,8 @@ class OrderAndClientRepositoryImpli implements OrderAndClientRepository {
         body: {
           "client_id": clientId ?? '',
           "lead_id": leadId ?? '',
-          "notes": note ?? '',
+          "note_id": noteId ?? '',
+          "language_id": languageId ?? '',
         },
       );
 
@@ -482,6 +490,146 @@ class OrderAndClientRepositoryImpli implements OrderAndClientRepository {
         final dynamic data = json.decode(response.body);
         print('client meeting  delete inside : ${data['message']}');
         return Right(Success(message: data['message']));
+      }
+      // ✅ 401 — TOKEN EXPIRED / UNAUTHORIZED
+      else if (response.statusCode == 401) {
+        String message = "Unauthorized access";
+
+        final errorBody = json.decode(response.body);
+
+        message = errorBody['message'] ?? message;
+
+        return Left(AuthFailure(message));
+      } else if (response.statusCode >= 400 && response.statusCode < 500) {
+        final errorBody = json.decode(response.body);
+        final message = errorBody['message'] ?? 'Something went wrong';
+        return Left(ClientFailure(message));
+      } else if (response.statusCode >= 500) {
+        try {
+          final errorBody = json.decode(response.body);
+          final message = errorBody['message'] ?? response.body.toString();
+          return Left(ServerFailure(message));
+        } catch (e) {
+          print("XXXXXXXXXXXXX${e}");
+          // if body is not JSON (HTML / plain text), just show raw body
+          return Left(
+            ServerFailure(
+              response.body.isNotEmpty
+                  ? 'Internal server error (500)'
+                  : 'Internal server error (500)',
+            ),
+          );
+        }
+      } else {
+        return Left(
+          OtherFailureNon200('Unexpected status: ${response.statusCode}'),
+        );
+      }
+    } on SocketException {
+      return Left(NetworkFailure('No Internet connection'));
+    } catch (e) {
+      log('Unexpected error: $e');
+      return Left(OtherFailureNon200('Unexpected error occurred'));
+    } finally {
+      // Optional cleanup logic
+      log('API call completed'); // for debugging
+      client.close(); //if you created an HttpClient manually
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<CallLanguage>?>> getOrderCallLAnguage(
+    String? token,
+  ) async {
+    final client = http.Client();
+
+    try {
+      final response = await client.get(
+        Uri.parse(
+          "${ApiEndPoint.baseUrl}${ApiEndPoint.leadCallLanguageEndPoint}",
+        ),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      log("get client call language listxxxxxxxxxxxxxxx  : ${response.body}");
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body)['data'];
+        final leadLanguage = data.map((e) => CallLanguage.fromJson(e)).toList();
+        // final Map<String, dynamic> jsonMap = json.decode(response.body);
+        // Convert JSON into LeadManagementModel
+        // final leadModel = LeadManagmentModel.fromJson(leadStatusList);
+        print('get client call language  list inside : ${leadLanguage}');
+        return Right(leadLanguage);
+      }
+      // ✅ 401 — TOKEN EXPIRED / UNAUTHORIZED
+      else if (response.statusCode == 401) {
+        String message = "Unauthorized access";
+
+        final errorBody = json.decode(response.body);
+
+        message = errorBody['message'] ?? message;
+
+        return Left(AuthFailure(message));
+      } else if (response.statusCode >= 400 && response.statusCode < 500) {
+        final errorBody = json.decode(response.body);
+        final message = errorBody['message'] ?? 'Something went wrong';
+        return Left(ClientFailure(message));
+      } else if (response.statusCode >= 500) {
+        try {
+          final errorBody = json.decode(response.body);
+          final message = errorBody['message'] ?? response.body.toString();
+          return Left(ServerFailure(message));
+        } catch (e) {
+          print("XXXXXXXXXXXXX${e}");
+          // if body is not JSON (HTML / plain text), just show raw body
+          return Left(
+            ServerFailure(
+              response.body.isNotEmpty
+                  ? 'Internal server error (500)'
+                  : 'Internal server error (500)',
+            ),
+          );
+        }
+      } else {
+        return Left(
+          OtherFailureNon200('Unexpected status: ${response.statusCode}'),
+        );
+      }
+    } on SocketException {
+      return Left(NetworkFailure('No Internet connection'));
+    } catch (e) {
+      log('Unexpected error: $e');
+      return Left(OtherFailureNon200('Unexpected error occurred'));
+    } finally {
+      // Optional cleanup logic
+      log('API call completed'); // for debugging
+      client.close(); //if you created an HttpClient manually
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<CallNote>?>> getOrderCallNote(
+    String? token,
+  ) async {
+    final client = http.Client();
+
+    try {
+      final response = await client.get(
+        Uri.parse("${ApiEndPoint.baseUrl}${ApiEndPoint.leadCallNotesEndPoint}"),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      log("get client call note listxxxxxxxxxxxxxxx  : ${response.body}");
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body)['data'];
+        final leadCallNote = data.map((e) => CallNote.fromJson(e)).toList();
+        // final Map<String, dynamic> jsonMap = json.decode(response.body);
+        // Convert JSON into LeadManagementModel
+        // final leadModel = LeadManagmentModel.fromJson(leadStatusList);
+        print('get client call note  list inside : ${leadCallNote}');
+        return Right(leadCallNote);
       }
       // ✅ 401 — TOKEN EXPIRED / UNAUTHORIZED
       else if (response.statusCode == 401) {

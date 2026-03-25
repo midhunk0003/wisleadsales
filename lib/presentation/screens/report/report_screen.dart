@@ -203,17 +203,19 @@ class _ReportScreenState extends State<ReportScreen> {
                                               borderRadius:
                                                   BorderRadius.circular(12),
                                             ),
-                                            child: Text(
-                                              '${reportProvider.range[index]['title']}',
-                                              style: GoogleFonts.poppins(
-                                                color:
-                                                    reportProvider
-                                                                .selectedRange ==
-                                                            reportProvider
-                                                                .range[index]['range']
-                                                        ? Colors.black
-                                                        : Colors.white54,
-                                                fontWeight: FontWeight.w500,
+                                            child: Center(
+                                              child: Text(
+                                                '${reportProvider.range[index]['title']}',
+                                                style: GoogleFonts.poppins(
+                                                  color:
+                                                      reportProvider
+                                                                  .selectedRange ==
+                                                              reportProvider
+                                                                  .range[index]['range']
+                                                          ? Colors.black
+                                                          : Colors.white54,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
                                               ),
                                             ),
                                           ),
@@ -226,130 +228,203 @@ class _ReportScreenState extends State<ReportScreen> {
                                   ),
                                   const SizedBox(height: 16),
                                   reportProvider.selectedRange == 'custom'
-                                      ? Row(
-                                        children: [
-                                          Expanded(
-                                            child: TextFormField(
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                              ),
-                                              controller: startDateController,
-                                              readOnly: true,
-                                              onTap: () async {
-                                                FocusScope.of(
-                                                  context,
-                                                ).requestFocus(
-                                                  FocusNode(),
-                                                ); // hide keyboard
-
-                                                final DateTime? picked =
-                                                    await showDatePicker(
-                                                      context: context,
-                                                      initialDate:
-                                                          DateTime.now(),
-                                                      firstDate: DateTime(2000),
-                                                      lastDate: DateTime(2100),
-                                                    );
-
-                                                if (picked != null) {
-                                                  startDateController.text =
-                                                      "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
-                                                }
-                                              },
-                                              decoration: InputDecoration(
-                                                labelStyle: TextStyle(
-                                                  color: Colors.white,
-                                                ),
-                                                labelText: "Start Date",
-                                                hintText: "Start Date",
-                                                border: OutlineInputBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                ),
-                                              ),
-                                            ),
+                                      ? Container(
+                                        padding: const EdgeInsets.all(12),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFF1E1E1E),
+                                          borderRadius: BorderRadius.circular(
+                                            14,
                                           ),
-                                          Text('To'),
-                                          Expanded(
-                                            child: TextFormField(
-                                              controller: endDateController,
-                                              readOnly: true,
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                              ),
-                                              decoration: InputDecoration(
-                                                labelStyle: TextStyle(
-                                                  color: Colors.white,
-                                                ),
-                                                labelText: "End Date",
-                                                hintText: "End Date",
-                                                border: OutlineInputBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                ),
-                                              ),
-                                              onTap: () async {
-                                                FocusScope.of(
-                                                  context,
-                                                ).requestFocus(
-                                                  FocusNode(),
-                                                ); // hide keyboard
-
-                                                final DateTime? picked =
-                                                    await showDatePicker(
-                                                      context: context,
-                                                      initialDate:
-                                                          DateTime.now(),
-                                                      firstDate: DateTime(2000),
-                                                      lastDate: DateTime(2100),
-                                                    );
-
-                                                if (picked != null) {
-                                                  endDateController.text =
-                                                      "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
-                                                }
-                                              },
-                                            ),
+                                          border: Border.all(
+                                            color: Colors.white12,
                                           ),
-                                          SizedBox(width: 10),
-                                          Expanded(
-                                            child: InkWell(
-                                              onTap: () {
-                                                reportProvider.getReportPro(
-                                                  '${reportProvider.selectedType}',
-                                                  '${reportProvider.selectedRange}',
-                                                  '${startDateController.text.toString()}',
-                                                  '${endDateController.text.toString()}',
-                                                );
-                                                startDateController.text = '';
-                                                endDateController.text = '';
-                                              },
-                                              child: Container(
-                                                padding: EdgeInsets.symmetric(
-                                                  vertical: 10,
-                                                  horizontal: 20,
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            /// Start Date
+                                            Expanded(
+                                              child: TextFormField(
+                                                controller: startDateController,
+                                                readOnly: true,
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w500,
                                                 ),
-                                                decoration: BoxDecoration(
-                                                  border: Border.all(
-                                                    color: kButtonColor2,
+                                                onTap: () async {
+                                                  FocusScope.of(
+                                                    context,
+                                                  ).unfocus();
+
+                                                  final DateTime?
+                                                  picked = await showDatePicker(
+                                                    context: context,
+                                                    initialDate: DateTime.now(),
+                                                    firstDate: DateTime(2000),
+                                                    lastDate: DateTime(2100),
+                                                  );
+
+                                                  if (picked != null) {
+                                                    startDateController.text =
+                                                        "${picked.day.toString().padLeft(2, '0')}-"
+                                                        "${picked.month.toString().padLeft(2, '0')}-"
+                                                        "${picked.year}";
+                                                  }
+                                                },
+                                                decoration: InputDecoration(
+                                                  labelText: "Start Date",
+                                                  hintText: "DD-MM-YYYY",
+                                                  labelStyle: const TextStyle(
+                                                    color: Colors.white60,
                                                   ),
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
+                                                  hintStyle: const TextStyle(
+                                                    color: Colors.white38,
+                                                  ),
+                                                  filled: true,
+                                                  fillColor: const Color(
+                                                    0xFF2A2A2D,
+                                                  ),
+                                                  contentPadding:
+                                                      const EdgeInsets.symmetric(
+                                                        vertical: 12,
+                                                        horizontal: 10,
+                                                      ),
+                                                  border: OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          10,
+                                                        ),
+                                                    borderSide: BorderSide.none,
+                                                  ),
                                                 ),
-                                                child: Center(
-                                                  child: Text(
-                                                    'Show',
-                                                    style: GoogleFonts.poppins(
-                                                      color: Colors.white70,
-                                                      fontSize:
-                                                          isTablet ? 20 : 14,
+                                              ),
+                                            ),
+
+                                            /// Divider
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 8,
+                                                  ),
+                                              child: Text(
+                                                "—",
+                                                style: TextStyle(
+                                                  color: Colors.white54,
+                                                  fontSize: isTablet ? 22 : 18,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            ),
+
+                                            ///  End Date
+                                            Expanded(
+                                              child: TextFormField(
+                                                controller: endDateController,
+                                                readOnly: true,
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                                onTap: () async {
+                                                  FocusScope.of(
+                                                    context,
+                                                  ).unfocus();
+
+                                                  final DateTime?
+                                                  picked = await showDatePicker(
+                                                    context: context,
+                                                    initialDate: DateTime.now(),
+                                                    firstDate: DateTime(2000),
+                                                    lastDate: DateTime(2100),
+                                                  );
+
+                                                  if (picked != null) {
+                                                    endDateController.text =
+                                                        "${picked.day.toString().padLeft(2, '0')}-"
+                                                        "${picked.month.toString().padLeft(2, '0')}-"
+                                                        "${picked.year}";
+                                                  }
+                                                },
+                                                decoration: InputDecoration(
+                                                  labelText: "End Date",
+                                                  hintText: "DD-MM-YYYY",
+                                                  labelStyle: const TextStyle(
+                                                    color: Colors.white60,
+                                                  ),
+                                                  hintStyle: const TextStyle(
+                                                    color: Colors.white38,
+                                                  ),
+                                                  filled: true,
+                                                  fillColor: const Color(
+                                                    0xFF2A2A2D,
+                                                  ),
+                                                  contentPadding:
+                                                      const EdgeInsets.symmetric(
+                                                        vertical: 12,
+                                                        horizontal: 10,
+                                                      ),
+                                                  border: OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          10,
+                                                        ),
+                                                    borderSide: BorderSide.none,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+
+                                            const SizedBox(width: 10),
+
+                                            /// Show Button
+                                            Expanded(
+                                              child: InkWell(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                onTap: () {
+                                                  reportProvider.getReportPro(
+                                                    '${reportProvider.selectedType}',
+                                                    '${reportProvider.selectedRange}',
+                                                    startDateController.text,
+                                                    endDateController.text,
+                                                  );
+
+                                                  startDateController.clear();
+                                                  endDateController.clear();
+                                                },
+                                                child: Container(
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        vertical: 12,
+                                                      ),
+                                                  decoration: BoxDecoration(
+                                                    color: kButtonColor2,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          10,
+                                                        ),
+                                                  ),
+                                                  child: Center(
+                                                    child: Text(
+                                                      "Show",
+                                                      style:
+                                                          GoogleFonts.poppins(
+                                                            color: Colors.black,
+                                                            fontSize:
+                                                                isTablet
+                                                                    ? 16
+                                                                    : 13,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                          ),
                                                     ),
                                                   ),
                                                 ),
                                               ),
                                             ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       )
                                       : SizedBox.shrink(),
                                   const SizedBox(height: 16),
@@ -401,17 +476,19 @@ class _ReportScreenState extends State<ReportScreen> {
                                               borderRadius:
                                                   BorderRadius.circular(12),
                                             ),
-                                            child: Text(
-                                              '${reportProvider.type[index]['title']}',
-                                              style: GoogleFonts.poppins(
-                                                color:
-                                                    reportProvider
-                                                                .selectedType ==
-                                                            reportProvider
-                                                                .type[index]['type']
-                                                        ? Colors.black
-                                                        : Colors.white54,
-                                                fontWeight: FontWeight.w500,
+                                            child: Center(
+                                              child: Text(
+                                                '${reportProvider.type[index]['title']}',
+                                                style: GoogleFonts.poppins(
+                                                  color:
+                                                      reportProvider
+                                                                  .selectedType ==
+                                                              reportProvider
+                                                                  .type[index]['type']
+                                                          ? Colors.black
+                                                          : Colors.white54,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
                                               ),
                                             ),
                                           ),
@@ -608,6 +685,7 @@ class _ReportScreenState extends State<ReportScreen> {
                                                         100,
                                                     title: "Present",
                                                     subtitle: "",
+                                                    valueColor: kButtonColor2,
                                                   ),
                                                 ),
                                                 const SizedBox(width: 8),
@@ -625,6 +703,8 @@ class _ReportScreenState extends State<ReportScreen> {
                                                         100,
                                                     title: "Absent",
                                                     subtitle: "",
+                                                    valueColor:
+                                                        Colors.blueAccent,
                                                   ),
                                                 ),
                                               ],
@@ -646,6 +726,7 @@ class _ReportScreenState extends State<ReportScreen> {
                                                         100,
                                                     title: "Late",
                                                     subtitle: "",
+                                                    valueColor: Colors.red,
                                                   ),
                                                 ),
                                                 const SizedBox(width: 8),
@@ -663,6 +744,7 @@ class _ReportScreenState extends State<ReportScreen> {
                                                         100,
                                                     title: "Early Logout",
                                                     subtitle: "",
+                                                    valueColor: Colors.yellow,
                                                   ),
                                                 ),
                                               ],
@@ -679,40 +761,69 @@ class _ReportScreenState extends State<ReportScreen> {
                                             Expanded(child: statCardShimmer()),
                                           ],
                                         )
-                                        : Row(
+                                        : Column(
                                           children: [
-                                            Expanded(
-                                              child: _StatCard(
-                                                percent:
-                                                    (double.tryParse(
-                                                          reportProvider
-                                                                  .reportModel
-                                                                  ?.report
-                                                                  ?.pendingPercentageAmount ??
-                                                              "0",
-                                                        ) ??
-                                                        0) /
-                                                    100,
-                                                title: "Pending Amount",
-                                                subtitle: "",
-                                              ),
+                                            Row(
+                                              children: [
+                                                Expanded(
+                                                  child: _StatCard(
+                                                    percent:
+                                                        ((double.tryParse(
+                                                                  reportProvider
+                                                                          .reportModel
+                                                                          ?.report
+                                                                          ?.pendingPercentageAmount ??
+                                                                      "0",
+                                                                ) ??
+                                                                0) /
+                                                            100),
+                                                    title: "Pending Amount",
+                                                    subtitle: "",
+                                                    valueColor: kButtonColor2,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 12),
+                                                Expanded(
+                                                  child: _StatCard(
+                                                    percent:
+                                                        (double.tryParse(
+                                                              reportProvider
+                                                                      .reportModel
+                                                                      ?.report
+                                                                      ?.approvedPercentageAmount ??
+                                                                  "0",
+                                                            ) ??
+                                                            0) /
+                                                        100,
+                                                    title: "Approved",
+                                                    subtitle: "",
+                                                    valueColor:
+                                                        Colors.blueAccent,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                            const SizedBox(width: 12),
-                                            Expanded(
-                                              child: _StatCard(
-                                                percent:
-                                                    (double.tryParse(
-                                                          reportProvider
-                                                                  .reportModel
-                                                                  ?.report
-                                                                  ?.approvedPercentageAmount ??
-                                                              "0",
-                                                        ) ??
-                                                        0) /
-                                                    100,
-                                                title: "Approved",
-                                                subtitle: "",
-                                              ),
+                                            SizedBox(height: 10),
+                                            Row(
+                                              children: [
+                                                Expanded(
+                                                  child: _StatCard(
+                                                    percent:
+                                                        (double.tryParse(
+                                                              reportProvider
+                                                                      .reportModel
+                                                                      ?.report
+                                                                      ?.rejectedPercentageAmount ??
+                                                                  "0",
+                                                            ) ??
+                                                            0) /
+                                                        100,
+                                                    title: "Rejected Amount",
+                                                    subtitle: "",
+                                                    valueColor: Colors.orange,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ],
                                         ),
@@ -743,6 +854,7 @@ class _ReportScreenState extends State<ReportScreen> {
                                                     100,
                                                 title: "Active Clients",
                                                 subtitle: "",
+                                                valueColor: kButtonColor2,
                                               ),
                                             ),
                                             const SizedBox(width: 12),
@@ -760,6 +872,7 @@ class _ReportScreenState extends State<ReportScreen> {
                                                     100,
                                                 title: "Inactive Clients",
                                                 subtitle: "",
+                                                valueColor: Colors.blueAccent,
                                               ),
                                             ),
                                           ],
@@ -791,6 +904,7 @@ class _ReportScreenState extends State<ReportScreen> {
                                                     100,
                                                 title: "Converted Leads",
                                                 subtitle: "",
+                                                valueColor: kButtonColor2,
                                               ),
                                             ),
                                             const SizedBox(width: 12),
@@ -808,13 +922,14 @@ class _ReportScreenState extends State<ReportScreen> {
                                                     100,
                                                 title: "Pending",
                                                 subtitle: "",
+                                                valueColor: Colors.blueAccent,
                                               ),
                                             ),
                                           ],
                                         ),
 
                                   /*********************Status Section percentage card End************************** */
-                                  const SizedBox(height: 24),
+                                  const SizedBox(height: 10),
                                   /*********************charts section start************************** */
                                   // Chart Section
                                   Row(
@@ -1064,6 +1179,7 @@ class ReportColumCard extends StatelessWidget {
                   ],
                 ),
               ),
+
               const SizedBox(width: 10),
               // CircularPercentIndicator(
               //   radius: 45,
@@ -1126,7 +1242,7 @@ class ReportColumCard extends StatelessWidget {
                     _ReportItem(
                       title: "Rejected",
                       value:
-                          "₹ ${reportProvider.reportModel!.report!.rejectedAmount ?? 'N/A'}",
+                          "${reportProvider.reportModel!.report!.rejectedCount ?? 'N/A'}",
                     ),
                   ],
                 ),
@@ -1233,6 +1349,7 @@ class ReportColumCard extends StatelessWidget {
 class _ReportItem extends StatelessWidget {
   final String title;
   final String value;
+
   const _ReportItem({required this.title, required this.value});
 
   @override
@@ -1254,7 +1371,13 @@ class _StatCard extends StatelessWidget {
   final double percent;
   final String title;
   final String? subtitle;
-  const _StatCard({required this.percent, required this.title, this.subtitle});
+  final Color valueColor;
+  const _StatCard({
+    required this.percent,
+    required this.title,
+    this.subtitle,
+    required this.valueColor,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1272,10 +1395,10 @@ class _StatCard extends StatelessWidget {
             radius: 40,
             lineWidth: 8,
             percent: percent,
-            progressColor: kButtonColor2,
+            progressColor: valueColor,
             backgroundColor: Colors.white10,
             center: Text(
-              "${(percent * 100).toInt()}%",
+              "${(percent * 100).toStringAsFixed(0)}%",
               style: const TextStyle(color: Colors.white),
             ),
           ),
@@ -1450,6 +1573,19 @@ class _PieChartWidget extends StatelessWidget {
                               title:
                                   '${double.parse(reportProvider.reportModel!.report!.latePercentage ?? "0").toStringAsFixed(0)}%',
                             ),
+
+                            PieChartSectionData(
+                              color: Colors.orangeAccent,
+                              value: double.parse(
+                                reportProvider
+                                        .reportModel!
+                                        .report!
+                                        .earlyLogoutPercentage ??
+                                    "0",
+                              ),
+                              title:
+                                  '${double.parse(reportProvider.reportModel!.report!.earlyLogoutPercentage ?? "0").toStringAsFixed(0)}%',
+                            ),
                           ],
                         ),
                       ),
@@ -1586,18 +1722,6 @@ class _PieChartWidget extends StatelessWidget {
                               title:
                                   '${double.parse(reportProvider.reportModel!.report!.inactiveClientsPercentage ?? "0").toStringAsFixed(0)}%',
                             ),
-                            PieChartSectionData(
-                              color: Colors.orangeAccent,
-                              value: double.parse(
-                                reportProvider
-                                        .reportModel!
-                                        .report!
-                                        .pendingClientsPercentage ??
-                                    "0",
-                              ),
-                              title:
-                                  '${double.parse(reportProvider.reportModel!.report!.pendingClientsPercentage ?? "0").toStringAsFixed(0)}%',
-                            ),
                           ],
                         ),
                       ),
@@ -1607,7 +1731,10 @@ class _PieChartWidget extends StatelessWidget {
               child:
                   _isAllZero([
                         reportProvider.reportModel!.report!.convertedPercentage,
-                        reportProvider.reportModel!.report!.pendingPercentage,
+                        reportProvider
+                            .reportModel!
+                            .report!
+                            .pendingClientsPercentage,
                       ])
                       ? const Center(
                         child: Text(
@@ -1620,6 +1747,7 @@ class _PieChartWidget extends StatelessWidget {
                           sectionsSpace: 2,
                           centerSpaceRadius: 30,
                           sections: [
+                            /// 🔵 Converted %
                             PieChartSectionData(
                               color: kButtonColor2,
                               value: double.parse(
@@ -1634,19 +1762,27 @@ class _PieChartWidget extends StatelessWidget {
                               titleStyle: const TextStyle(
                                 color: Colors.black,
                                 fontWeight: FontWeight.bold,
+                                fontSize: 14,
                               ),
                             ),
+
+                            /// 🟢 Pending %
                             PieChartSectionData(
                               color: Colors.blueAccent,
                               value: double.parse(
                                 reportProvider
                                         .reportModel!
                                         .report!
-                                        .pendingClientsPercentage ??
+                                        .pendingPercentage ??
                                     "0",
                               ),
                               title:
-                                  '${double.parse(reportProvider.reportModel!.report!.pendingClientsPercentage ?? "0").toStringAsFixed(0)}%',
+                                  '${double.parse(reportProvider.reportModel!.report!.pendingPercentage ?? "0").toStringAsFixed(0)}%',
+                              titleStyle: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
                             ),
                           ],
                         ),
