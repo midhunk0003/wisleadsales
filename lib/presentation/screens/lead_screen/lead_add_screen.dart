@@ -747,6 +747,7 @@ class _LeadAddScreenState extends State<LeadAddScreen> {
                                                 leadProvider.getLeadPro(
                                                   '',
                                                   '',
+                                                  '',
                                                   isRefresh: true,
                                                 );
 

@@ -111,6 +111,7 @@ class LeadManagmentRepositoryImpli extends LeadManagmentRepository {
     String? search,
     String? leadStatusId,
     String? currentPage,
+    String? attendOrNot,
   ) async {
     final client = http.Client();
 
@@ -122,6 +123,7 @@ class LeadManagmentRepositoryImpli extends LeadManagmentRepository {
           "search": search ?? '',
           "lead_status_id": leadStatusId ?? '',
           'page': currentPage ?? '',
+          'call_status': attendOrNot ?? '',
         },
       );
 

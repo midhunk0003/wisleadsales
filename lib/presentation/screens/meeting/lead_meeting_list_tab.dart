@@ -752,6 +752,7 @@ class _LeadMeetingListTabState extends State<LeadMeetingListTab> {
                                                                         .getLeadPro(
                                                                           '',
                                                                           '',
+                                                                          '',
                                                                         );
                                                                   }
                                                                 },
@@ -1674,6 +1675,7 @@ class _LeadMeetingListTabState extends State<LeadMeetingListTab> {
                                                         .clearSelectdData();
 
                                                     leadProvider.getLeadPro(
+                                                      '',
                                                       '',
                                                       '',
                                                       isRefresh: true,

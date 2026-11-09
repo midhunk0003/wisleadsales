@@ -22,7 +22,9 @@
     <application
         android:label="Wteams"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:usesCleartextTraffic="true"
+        android:hardwareAccelerated="true">
         <meta-data android:name="com.google.android.geo.API_KEY"
                android:value="AIzaSyC-0I20uxDH3DDMetXqG_9VlRD9WGsvEYE"/>
         <service

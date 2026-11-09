@@ -49,13 +49,13 @@ class _LeadListScreenState extends State<LeadListScreen> {
 
   void _loadLeadData() async {
     final leadProvider = Provider.of<LeadProvider>(context, listen: false);
-
+    leadProvider.toogleSwitchPro('all');
     leadProvider.clearCurrentPage();
     leadProvider.getFilterSelectedIndex('');
     // First load status
     await leadProvider.getLeadStatusPro();
     // Then load lead data
-    await leadProvider.getLeadPro('', '', isRefresh: true);
+    await leadProvider.getLeadPro('', '', '', isRefresh: true);
     leadProvider.getLeadSourcePro();
     // Load customer profile
     leadProvider.getCustomerProfilePro();
@@ -71,6 +71,7 @@ class _LeadListScreenState extends State<LeadListScreen> {
         leadProvider.getLeadPro(
           '',
           leadProvider.getFilterLeadIndex,
+          '',
           isRefresh: false,
         );
       }
@@ -118,7 +119,12 @@ class _LeadListScreenState extends State<LeadListScreen> {
                           leadProvider.failure?.message ??
                           "No internet connection",
                       onRetry: () async {
-                        await leadProvider.getLeadPro('', '', isRefresh: true);
+                        await leadProvider.getLeadPro(
+                          '',
+                          '',
+                          '',
+                          isRefresh: true,
+                        );
                       },
                     );
                   }
@@ -164,6 +170,7 @@ class _LeadListScreenState extends State<LeadListScreen> {
                                 await leadProvider.getLeadPro(
                                   '${_searchController.text.toString()}',
                                   '',
+                                  '',
                                   isRefresh: true,
                                 );
                               },
@@ -203,6 +210,7 @@ class _LeadListScreenState extends State<LeadListScreen> {
                                           leadProvider.getLeadPro(
                                             '',
                                             '${leadProvider.filterStringLead[index]['statusid']}',
+                                            '',
                                             isRefresh: true,
                                           );
                                         },
@@ -988,6 +996,7 @@ class _LeadListScreenState extends State<LeadListScreen> {
                                                                       leadProvider.getLeadPro(
                                                                         '',
                                                                         '',
+                                                                        '',
                                                                         isRefresh:
                                                                             true,
                                                                       );
@@ -1588,10 +1597,11 @@ class _LeadListScreenState extends State<LeadListScreen> {
                                                                   CircularProgressIndicator(),
                                                             )
                                                             : (leadProvider
-                                                                    .isLoadingCallNotes ||
-                                                                leadProvider
                                                                         .getLeadCallNotes ==
-                                                                    null)
+                                                                    null ||
+                                                                leadProvider
+                                                                    .getLeadCallNotes!
+                                                                    .isEmpty)
                                                             ? Center(
                                                               child: Text(
                                                                 'Status Empty',
@@ -1832,20 +1842,21 @@ class _LeadListScreenState extends State<LeadListScreen> {
                                                             ? (leadProvider
                                                                         .isLoadingCallNotes ||
                                                                     leadProvider
-                                                                            .getLeadCallNotes ==
+                                                                            .getLeadCallLanguage ==
                                                                         null)
                                                                 ? Center(
                                                                   child:
                                                                       CircularProgressIndicator(),
                                                                 )
                                                                 : (leadProvider
-                                                                        .isLoadingCallNotes ||
+                                                                            .getLeadCallLanguage ==
+                                                                        null ||
                                                                     leadProvider
-                                                                            .getLeadCallNotes ==
-                                                                        null)
+                                                                        .getLeadCallLanguage!
+                                                                        .isEmpty)
                                                                 ? Center(
                                                                   child: Text(
-                                                                    'Status Empty',
+                                                                    'Language Empty',
                                                                   ),
                                                                 )
                                                                 : ListView.separated(
@@ -2053,6 +2064,7 @@ class _LeadListScreenState extends State<LeadListScreen> {
 
                                                           leadProvider
                                                               .getLeadPro(
+                                                                '',
                                                                 '',
                                                                 '',
                                                                 isRefresh: true,
@@ -2463,6 +2475,7 @@ class _AddMeetingShaduleWidgetState extends State<AddMeetingShaduleWidget> {
                                         widget.provider.getLeadPro(
                                           '',
                                           '',
+                                          '',
                                           isRefresh: true,
                                         );
                                         showSuccessDialog(
@@ -2509,29 +2522,138 @@ class _AddMeetingShaduleWidgetState extends State<AddMeetingShaduleWidget> {
 
 class FavAndAddWidget extends StatelessWidget {
   final bool isTablet;
+
   const FavAndAddWidget({super.key, required this.isTablet});
 
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        // Container(
-        //   height: isTablet ? 60 : 45,
-        //   width: isTablet ? 60 : 45,
-        //   decoration: BoxDecoration(
-        //     // borderRadius: BorderRadius.all()
-        //     border: Border.all(color: Colors.grey),
-        //     shape: BoxShape.circle,
-        //   ),
-        //   child: Center(
-        //     child: Image.asset(
-        //       'assets/images/star.png',
-        //       width: isTablet ? 30 : 16,
-        //       height: isTablet ? 30 : 16,
-        //     ),
-        //   ),
-        // ),
+        Consumer<LeadProvider>(
+          builder: (context, leadProvider, _) {
+            final isAll = leadProvider.toogleValueFIlter == 'all';
+
+            const containerColor = Color(
+              0xFFF7FBEA,
+            ); // very light lime background
+            const sliderColor = Colors.white;
+
+            const activeTextColor = Colors.black;
+            const inactiveTextColor = Color(0xFF6B7280); // soft grey
+            const kButtonColor2 = Color(0xFFD1F66F);
+
+            return Container(
+              width: 260,
+              height: 50,
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: Colors.black87,
+                borderRadius: BorderRadius.circular(30),
+                border: Border.all(
+                  color: kButtonColor2.withOpacity(0.6),
+                  width: 1,
+                ),
+              ),
+              child: Stack(
+                children: [
+                  /// 🔥 Animated Slider
+                  AnimatedAlign(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                    alignment:
+                        isAll ? Alignment.centerLeft : Alignment.centerRight,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 250),
+                      width: 125,
+                      height: double.infinity,
+                      decoration: BoxDecoration(
+                        color: kButtonColor2, // selected card
+                        borderRadius: BorderRadius.circular(30),
+                        border: Border.all(
+                          color: kButtonColor2.withOpacity(0.6),
+                          width: 1,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: kButtonColor2.withOpacity(0.25),
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  /// 🧠 Buttons
+                  Row(
+                    children: [
+                      /// ALL CALLS
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () async {
+                            leadProvider.toogleSwitchPro('all');
+                            await leadProvider.getLeadPro(
+                              '',
+                              '',
+                              '',
+                              isRefresh: true,
+                            );
+                          },
+                          child: Center(
+                            child: AnimatedDefaultTextStyle(
+                              duration: const Duration(milliseconds: 250),
+                              style: TextStyle(
+                                color:
+                                    isAll ? activeTextColor : inactiveTextColor,
+                                fontWeight:
+                                    isAll ? FontWeight.w600 : FontWeight.w500,
+                                fontSize: 14,
+                              ),
+                              child: const Text("All Calls"),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      /// UNCOVERED CALL
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () async {
+                            leadProvider.toogleSwitchPro('notattended');
+                            await leadProvider.getLeadPro(
+                              '',
+                              '',
+                              'not_attended',
+                              isRefresh: true,
+                            );
+                          },
+                          child: Center(
+                            child: AnimatedDefaultTextStyle(
+                              duration: const Duration(milliseconds: 250),
+                              style: TextStyle(
+                                color:
+                                    !isAll
+                                        ? activeTextColor
+                                        : inactiveTextColor,
+                                fontWeight:
+                                    !isAll ? FontWeight.w600 : FontWeight.w500,
+                                fontSize: 14,
+                              ),
+                              child: const Text("Uncovered Call"),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+
+        const SizedBox(width: 10),
         InkWell(
           onTap: () {
             Navigator.pushNamed(context, '/leadaddscreen');
@@ -2700,7 +2822,12 @@ class _MeetingCardState extends State<MeetingCard> {
                           "Success",
                           widget.leadProvider.success!.message.toString(),
                         );
-                        widget.leadProvider.getLeadPro('', '', isRefresh: true);
+                        widget.leadProvider.getLeadPro(
+                          '',
+                          '',
+                          '',
+                          isRefresh: true,
+                        );
                       }
                     },
                     textMain: "Delete Meeting",

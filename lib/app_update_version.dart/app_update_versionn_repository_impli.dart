@@ -19,7 +19,7 @@ class AppUpdateVersionnRepositoryImpli implements AppUpdateVersionRepository {
     try {
       final response = await client.get(
         Uri.parse('${ApiEndPoint.baseUrl}${ApiEndPoint.versionEndPoint}'),
-        headers: {'Authorization': 'Bearer $token'},
+        // headers: {'Authorization': 'Bearer $token'},
       );
 
       log(
@@ -59,7 +59,7 @@ class AppUpdateVersionnRepositoryImpli implements AppUpdateVersionRepository {
     } on SocketException {
       return Left(NetworkFailure('No Internet connection'));
     } catch (e) {
-      log('Unexpected error: $e');
+      log('Unexpected errorsss: $e');
       return Left(OtherFailureNon200('Unexpected error occurred'));
     } finally {
       // Optional cleanup logic

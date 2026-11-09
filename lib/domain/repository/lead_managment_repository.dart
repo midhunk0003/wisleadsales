@@ -29,6 +29,7 @@ abstract class LeadManagmentRepository {
     String? search,
     String? leadStatusId,
     String? currentPage,
+    String? attendOrNot,
   );
   Future<Either<Failure, Success>> deleteLead(String? token, String? id);
   Future<Either<Failure, Success>> updateLead(

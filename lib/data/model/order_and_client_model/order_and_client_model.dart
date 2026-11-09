@@ -159,6 +159,7 @@ class CallLogClientModel {
   @JsonKey(name: 'lead_id')
   int? leadId;
   String? notes;
+  String? language;
   @JsonKey(name: 'created_at')
   DateTime? createdAt;
   @JsonKey(name: 'updated_at')
@@ -171,6 +172,7 @@ class CallLogClientModel {
     this.clientId,
     this.leadId,
     this.notes,
+    this.language,
     this.createdAt,
     this.updatedAt,
     this.deletedAt,

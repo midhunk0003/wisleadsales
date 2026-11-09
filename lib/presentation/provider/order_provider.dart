@@ -209,7 +209,7 @@ class OrderProvider extends ChangeNotifier {
   void getClientStatus() {
     _isLoading = true;
     notifyListeners();
-    _clientStatus = ["Active", "Inactive", "Pending"];
+    _clientStatus = ["Active", "Inactive", "Pending", 'Uncovered Call'];
     _isLoading = false;
     notifyListeners();
   }

@@ -220,14 +220,14 @@ class _OrderUpdateScreenState extends State<OrderUpdateScreen> {
                                       controller: emailController,
 
                                       validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Please enter email address';
-                                        } else if (!RegExp(
-                                          r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
-                                        ).hasMatch(value)) {
-                                          return 'Please enter a valid email address';
-                                        }
-                                        return null;
+                                        // if (value == null || value.isEmpty) {
+                                        //   return 'Please enter email address';
+                                        // } else if (!RegExp(
+                                        //   r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                                        // ).hasMatch(value)) {
+                                        //   return 'Please enter a valid email address';
+                                        // }
+                                        // return null;
                                       },
                                     ),
                                     // const SizedBox(height: 20),

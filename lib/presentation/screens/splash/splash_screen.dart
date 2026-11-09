@@ -3,6 +3,9 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wisdeals/app_update_version.dart/app_update_version_provider.dart';
 import 'package:wisdeals/core/colors.dart';
+import 'package:wisdeals/core/failure.dart';
+import 'package:wisdeals/widgets/failure_diloge_widget.dart';
+import 'package:wisdeals/widgets/network_widget.dart';
 import 'package:wisdeals/widgets/reusable_scafold_and_glowbackground.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -16,92 +19,51 @@ class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animaton;
-  bool _shouldNavigate = true; // control navigation
   @override
   void initState() {
+    super.initState();
     _controller = AnimationController(
       vsync: this,
       duration: Duration(seconds: 3),
     )..forward();
     _animaton = Tween<double>(begin: 0.0, end: 1.0).animate(_controller);
-    super.initState();
     Future.delayed(const Duration(seconds: 3), () {
-      checkUpdate();
-      // _navigatToLoginOrHome();
-    });
-  }
-
-  Future<void> checkUpdate() async {
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final updateAppProvider = Provider.of<AppUpdateVersionProvider>(
-        context,
-        listen: false,
-      );
-      await updateAppProvider.fetchUpdateResponce();
-      // await updateAppProvider.checkForUpdate(context);
-      if (updateAppProvider.failure != null) {
-        // 👉 If internet/server error
-        print(
-          'updateAppProvider failure splash screen : ${updateAppProvider.failure}',
-        );
-        showErrorDialog(
-          context,
-          updateAppProvider.failure!.message ?? "Something went wrong!",
-        );
-      } else {
-        bool updateAvailable = await updateAppProvider.checkForUpdate(context);
-        print('updateAvailable splash screen : ${!updateAvailable}');
-        if (!updateAvailable) {
-          // only navigate if update is NOT available
-          Future.delayed(const Duration(seconds: 3), () {
-            if (_shouldNavigate) {
-              _navigatToLoginOrHome();
-            }
-          });
-        } else {
-          // prevent navigation if update dialog is showing
-          _shouldNavigate = false;
-        }
+      if (mounted) {
+        _navigatToLoginOrHome();
       }
     });
   }
 
-  void showErrorDialog(BuildContext context, String message) {
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder:
-          (context) => AlertDialog(
-            title: const Text("Error"),
-            content: Text(message),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text("Close"),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  Provider.of<AppUpdateVersionProvider>(
-                    context,
-                    listen: false,
-                  ).clearFailure();
-                  Provider.of<AppUpdateVersionProvider>(
-                    context,
-                    listen: false,
-                  ).fetchUpdateResponce();
-                  // Try again
-                  Provider.of<AppUpdateVersionProvider>(
-                    context,
-                    listen: false,
-                  ).checkForUpdate(context);
-                },
-                child: const Text("Retry"),
-              ),
-            ],
-          ),
-    );
-  }
+  // bool _isNavigated = false;
+
+  // void _safeNavigate() {
+  //   if (_isNavigated) return;
+  //   _isNavigated = true;
+  //   _navigatToLoginOrHome();
+  // }
+
+  // Future<void> checkUpdate() async {
+  //   try {
+  //     final updateAppProvider = Provider.of<AppUpdateVersionProvider>(
+  //       context,
+  //       listen: false,
+  //     );
+
+  //     // ⏱️ Add timeout (VERY IMPORTANT)
+  //     await updateAppProvider
+  //         .checkForUpdate(context)
+  //         .timeout(const Duration(seconds: 5));
+
+  //     if (!mounted) return;
+  //     _safeNavigate();
+  //     // If update available → dialog shown → DO NOTHING
+  //   } catch (e) {
+  //     // ✅ fallback → NEVER block user
+  //     if (mounted) {
+  //       _navigatToLoginOrHome();
+  //     }
+  //   }
+  // }
 
   Future<void> _navigatToLoginOrHome() async {
     final pref = await SharedPreferences.getInstance();
@@ -160,13 +122,23 @@ class _SplashScreenState extends State<SplashScreen>
                     ),
                     FadeTransition(
                       opacity: _animaton,
-                      child: Text(
-                        'Better team. Better growth',
-                        style: TextStyle(
-                          color: Color(0x80FFFFFF),
-                          fontWeight: FontWeight.w400,
-                          fontSize: _isTablet ? 24 : 12,
-                        ),
+                      child: Column(
+                        children: [
+                          Text(
+                            'Better team. Better growth',
+                            style: TextStyle(
+                              color: Color(0x80FFFFFF),
+                              fontWeight: FontWeight.w400,
+                              fontSize: _isTablet ? 24 : 12,
+                            ),
+                          ),
+                          Divider(
+                            color: Color(0x80FFFFFF),
+                            thickness: 0.3,
+                            indent: 120,
+                            endIndent: 120,
+                          ),
+                        ],
                       ),
                     ),
 

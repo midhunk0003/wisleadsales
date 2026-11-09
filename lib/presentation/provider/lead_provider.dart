@@ -55,6 +55,8 @@ class LeadProvider extends ChangeNotifier {
   String? _selectedCallLanguageId;
   String? _selectedCallLanguageName;
   bool _hideAndShowCallLanguage = false;
+  String? _toogleValueFIlter;
+  String? get toogleValueFIlter => _toogleValueFIlter;
 
   // lead count
   String? _totalLeads;
@@ -131,6 +133,11 @@ class LeadProvider extends ChangeNotifier {
   bool get hideAndShowCallLanguage => _hideAndShowCallLanguage;
 
   // functions
+
+  void toogleSwitchPro(String? value) {
+    _toogleValueFIlter = value;
+    notifyListeners();
+  }
 
   void hideAndShowCallFollowUpForSelectPro() {
     _hideAndShowCallFollowUpForSelect = !_hideAndShowCallFollowUpForSelect;
@@ -463,7 +470,8 @@ class LeadProvider extends ChangeNotifier {
 
   Future<void> getLeadPro(
     String? search,
-    String? leadStatusId, {
+    String? leadStatusId,
+    String? attendOrNot, {
     bool isRefresh = false,
   }) async {
     print('current page prooo : ${currentPage ?? ''}');
@@ -498,6 +506,7 @@ class LeadProvider extends ChangeNotifier {
       search.toString(),
       leadStatusId,
       _currentPage.toString(),
+      attendOrNot.toString(),
     );
 
     result.fold(

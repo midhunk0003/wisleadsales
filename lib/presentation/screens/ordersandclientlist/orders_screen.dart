@@ -699,7 +699,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                         style: TextStyle(
                                           fontFamily: "MontrealSerial",
                                           color: Colors.black,
-                                          fontSize: isTablet ? 20 : 12,
+                                          fontSize: isTablet ? 20 : 10,
                                           fontWeight: FontWeight.w400,
                                         ),
                                         overflow: TextOverflow.ellipsis,
@@ -765,7 +765,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                         style: TextStyle(
                                           fontFamily: "MontrealSerial",
                                           color: Colors.black,
-                                          fontSize: isTablet ? 20 : 12,
+                                          fontSize: isTablet ? 20 : 10,
                                           fontWeight: FontWeight.w400,
                                         ),
                                         overflow: TextOverflow.ellipsis,
@@ -779,12 +779,18 @@ class _OrdersScreenState extends State<OrdersScreen> {
                             // Apply Filter Button
                             InkWell(
                               onTap: () {
+                                print(
+                                  'ssssssssssssssssssssss : ${orderProvider.selectedStatusName.toString().replaceAll(' ', '')}',
+                                );
                                 orderProvider.hideandShowFilter();
 
                                 orderProvider.getClientsPro(
                                   '',
                                   isRefresh: true,
-                                  orderProvider.selectedStatusName ?? '',
+                                  orderProvider.selectedStatusName
+                                          .toString()
+                                          .replaceAll(' ', '') ??
+                                      '',
                                   orderProvider.selectedCustomerProfileId
                                           ?.toString() ??
                                       '',

@@ -61,44 +61,114 @@ class AppUpdateVersionProvider extends ChangeNotifier {
   }
 
   Future<bool> checkForUpdate(BuildContext context) async {
-    if (_appUpdateVersionModel!.data != null) {
-      // Assuming the first item in the list is the latest version
-      final packageInfo = await PackageInfo.fromPlatform();
-      final latestVersionAndroid = _appUpdateVersionModel!.data!.androidVersion;
-      final latestVersionIos = _appUpdateVersionModel!.data!.iosVersion;
-      print('Current app version: ${packageInfo.version}');
-      print('Latest available version Android: $latestVersionAndroid');
-      print('Latest available version Ios: $latestVersionIos');
-      // Here you would typically compare with the current app version
-      // For demonstration, let's assume current version is "1.0.0"
-      const currentVersion = "1.0.0";
+    try {
+      await fetchUpdateResponce();
+      final model = _appUpdateVersionModel;
 
-      if (latestVersionAndroid != packageInfo.version.toString()) {
-        print('from app version: ${packageInfo.version.toString()}');
-        print('Update available version from api: $latestVersionAndroid');
-        showUpdateDialog(
-          context,
-          _appUpdateVersionModel!.data!.forceUpdate!,
-          _appUpdateVersionModel!.data!.message,
-          _appUpdateVersionModel!.data!.updateUrlAndroid,
-          _appUpdateVersionModel!.data!.updateUrlIos,
-        );
-        _isUpdate = true;
-        notifyListeners();
-        return true;
-      } else {
-        print('App is up to date.');
+      /// ✅ Check model first
+      if (model == null || model.data == null) {
+        debugPrint('No update information available.');
         _isUpdate = false;
         notifyListeners();
         return false;
       }
-    } else {
-      print('No update information available.');
+
+      final data = model.data;
+      if (data != null) {
+        /// ✅ Safe values
+        final latestVersionAndroid = data.androidVersion;
+        final latestVersionIos = data.iosVersion;
+        final forceUpdate = data.forceUpdate ?? false;
+        final message = data.message ?? "New update available";
+        final urlAndroid = data.updateUrlAndroid ?? "";
+        final urlIos = data.updateUrlIos ?? "";
+
+        final packageInfo = await PackageInfo.fromPlatform();
+
+        final currentVersion = packageInfo.version;
+
+        debugPrint('Current version: $currentVersion');
+        debugPrint('Latest Android: $latestVersionAndroid');
+
+        /// ✅ If version missing → skip
+        if (latestVersionAndroid == null || latestVersionAndroid.isEmpty) {
+          debugPrint('Latest version is null');
+          return false;
+        }
+
+        /// ✅ Compare versions
+        if (latestVersionAndroid != currentVersion) {
+          debugPrint('Update available');
+          if (!context.mounted) return false;
+
+          /// ✅ Ensure dialog shows safely
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            showUpdateDialog(context, forceUpdate, message, urlAndroid, urlIos);
+          });
+          _isUpdate = true;
+          notifyListeners();
+          return true;
+        } else {
+          debugPrint('App is up to date');
+
+          _isUpdate = false;
+          notifyListeners();
+          return false;
+        }
+      } else {
+        print('No update information available.');
+        _isUpdate = false;
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      debugPrint("checkForUpdate crash: $e");
+
       _isUpdate = false;
       notifyListeners();
       return false;
     }
   }
+
+  // Future<bool> checkForUpdate(BuildContext context) async {
+  //   if (_appUpdateVersionModel!.data != null) {
+  //     // Assuming the first item in the list is the latest version
+  //     final packageInfo = await PackageInfo.fromPlatform();
+  //     final latestVersionAndroid = _appUpdateVersionModel!.data!.androidVersion;
+  //     final latestVersionIos = _appUpdateVersionModel!.data!.iosVersion;
+  //     print('Current app version: ${packageInfo.version}');
+  //     print('Latest available version Android: $latestVersionAndroid');
+  //     print('Latest available version Ios: $latestVersionIos');
+  //     // Here you would typically compare with the current app version
+  //     // For demonstration, let's assume current version is "1.0.0"
+  //     const currentVersion = "1.0.0";
+
+  //     if (latestVersionAndroid != packageInfo.version.toString()) {
+  //       print('from app version: ${packageInfo.version.toString()}');
+  //       print('Update available version from api: $latestVersionAndroid');
+  //       showUpdateDialog(
+  //         context,
+  //         _appUpdateVersionModel!.data!.forceUpdate!,
+  //         _appUpdateVersionModel!.data!.message,
+  //         _appUpdateVersionModel!.data!.updateUrlAndroid,
+  //         _appUpdateVersionModel!.data!.updateUrlIos,
+  //       );
+  //       _isUpdate = true;
+  //       notifyListeners();
+  //       return true;
+  //     } else {
+  //       print('App is up to date.');
+  //       _isUpdate = false;
+  //       notifyListeners();
+  //       return false;
+  //     }
+  //   } else {
+  //     print('No update information available.');
+  //     _isUpdate = false;
+  //     notifyListeners();
+  //     return false;
+  //   }
+  // }
 }
 
 Future<void> showUpdateDialog(

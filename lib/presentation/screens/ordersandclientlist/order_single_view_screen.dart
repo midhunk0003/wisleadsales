@@ -614,6 +614,16 @@ class _OrderSingleViewScreenState extends State<OrderSingleViewScreen> {
                                                                 fontSize: 14,
                                                               ),
                                                             ),
+                                                            Text(
+                                                              call.language ??
+                                                                  'No language',
+                                                              style: const TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                                fontSize: 14,
+                                                              ),
+                                                            ),
                                                             const SizedBox(
                                                               height: 4,
                                                             ),
@@ -1173,10 +1183,11 @@ class _OrderSingleViewScreenState extends State<OrderSingleViewScreen> {
                                                               CircularProgressIndicator(),
                                                         )
                                                         : (orderProvider
-                                                                .isLoadingCallNotes ||
-                                                            orderProvider
                                                                     .getClientCallNotes ==
-                                                                null)
+                                                                null ||
+                                                            orderProvider
+                                                                .getClientCallNotes!
+                                                                .isEmpty)
                                                         ? Center(
                                                           child: Text(
                                                             'Status Empty',
@@ -1412,13 +1423,14 @@ class _OrderSingleViewScreenState extends State<OrderSingleViewScreen> {
                                                                   CircularProgressIndicator(),
                                                             )
                                                             : (orderProvider
-                                                                    .isLoadingCallNotes ||
-                                                                orderProvider
                                                                         .getClientCallLanguage ==
-                                                                    null)
+                                                                    null ||
+                                                                orderProvider
+                                                                    .getClientCallLanguage!
+                                                                    .isEmpty)
                                                             ? Center(
                                                               child: Text(
-                                                                'Status Empty',
+                                                                'Language Empty',
                                                               ),
                                                             )
                                                             : ListView.separated(
@@ -1593,9 +1605,9 @@ class _OrderSingleViewScreenState extends State<OrderSingleViewScreen> {
                                                     }
                                                     await orderProvider
                                                         .clientAddcallLogsPro(
-                                                         orderProvider
+                                                          orderProvider
                                                               .clientIdForCallLog,
-                                                         '',
+                                                          '',
                                                           orderProvider
                                                               .selectedCallFollowUpId
                                                               .toString(),
